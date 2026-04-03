@@ -836,8 +836,8 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 const ADMIN_EMAIL_DEFAULT = 'admin@tejcrew.com';
 const ADMIN_PASS_DEFAULT  = 'tejcrew123';
 const ADMIN_MOBILE_DEFAULT = '+919876543210';
-const SUPABASE_URL  = '';
-const SUPABASE_ANON = '';
+const SUPABASE_URL  = 'https://syglacmkedhfwxrxdyzy.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5Z2xhY21rZWRoZnd4cnhkeXp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjY4MDQsImV4cCI6MjA5MDQwMjgwNH0.SY18t4O6iPGN7TfyRU2FOcFjQ_34tRo_xmPF03MztTo';
 
 let supabase = null;
 let cloudEnabled = false;
@@ -893,8 +893,130 @@ function initSupabase() {
     if (!window.supabase) return;
     supabase = window.supabase.createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
     cloudEnabled = true;
-    console.log('TejCrew cloud connected:', url);
-  } catch(e) { cloudEnabled = false; }
+    console.log('✅ TejCrew cloud connected:', url);
+  } catch(e) { cloudEnabled = false; console.warn('Supabase init failed:', e.message); }
+}
+
+// ── Cloud: save material ──
+async function cloudSaveMaterial(material) {
+  if (!cloudEnabled) return;
+  try {
+    await supabase.from('materials').upsert({
+      id: material.id, name: material.name, type: material.type,
+      category: material.category, description: material.desc,
+      tags: material.tags, uploaded_at: material.uploadedAt,
+      reads: material.reads, mime_type: material.mimeType,
+      file_name: material.fileName, file_url: material.fileUrl
+    });
+  } catch(e) { console.warn('Cloud save material failed:', e.message); }
+}
+
+// ── Cloud: delete material ──
+async function cloudDeleteMaterial(id) {
+  if (!cloudEnabled) return;
+  try { await supabase.from('materials').delete().eq('id', id); } catch(e) {}
+}
+
+// ── Cloud: save staff ──
+async function cloudSaveStaff(staff) {
+  if (!cloudEnabled) return;
+  try {
+    await supabase.from('staff').upsert({
+      id: staff.id, name: staff.name, email: staff.email,
+      role: staff.role, status: staff.status, password: staff.password,
+      reads: staff.reads, can_download: staff.canDownload, join_date: staff.joinDate
+    });
+  } catch(e) { console.warn('Cloud save staff failed:', e.message); }
+}
+
+// ── Cloud: delete staff ──
+async function cloudDeleteStaff(id) {
+  if (!cloudEnabled) return;
+  try { await supabase.from('staff').delete().eq('id', id); } catch(e) {}
+}
+
+// ── Cloud: save chat ──
+async function cloudSaveChat(chat) {
+  if (!cloudEnabled) return;
+  try {
+    await supabase.from('chats').upsert({
+      id: chat.id, text: chat.text, sender_name: chat.senderName,
+      sender_role: chat.senderRole, sender_email: chat.senderEmail,
+      time: chat.time, read_by_admin: chat.readByAdmin
+    });
+  } catch(e) { console.warn('Cloud save chat failed:', e.message); }
+}
+
+// ── Cloud: save read log ──
+async function cloudSaveReadLog(log) {
+  if (!cloudEnabled) return;
+  try {
+    await supabase.from('read_log').insert({
+      staff_name: log.staffName, staff_email: log.staffEmail,
+      doc_name: log.docName, category: log.category, time: log.time
+    });
+  } catch(e) { console.warn('Cloud save read log failed:', e.message); }
+}
+
+// ── Cloud: load all data ──
+async function cloudLoadAll() {
+  if (!cloudEnabled) return;
+  try {
+    // Load materials
+    const { data: mats } = await supabase.from('materials').select('*').order('id', { ascending: false });
+    if (mats && mats.length > 0) {
+      state.materials = mats.map(r => ({
+        id: r.id, name: r.name, type: r.type, category: r.category,
+        desc: r.description, tags: r.tags || [], uploadedAt: r.uploaded_at,
+        reads: r.reads || [], mimeType: r.mime_type, fileName: r.file_name,
+        fileUrl: r.file_url, fileData: null
+      }));
+    }
+    // Load staff
+    const { data: staff } = await supabase.from('staff').select('*').order('id', { ascending: false });
+    if (staff && staff.length > 0) {
+      state.staff = staff.map(r => ({
+        id: r.id, name: r.name, email: r.email, role: r.role,
+        status: r.status, password: r.password, reads: r.reads || [],
+        canDownload: r.can_download, joinDate: r.join_date
+      }));
+    }
+    // Load chats
+    const { data: chats } = await supabase.from('chats').select('*').order('id', { ascending: true });
+    if (chats && chats.length > 0) {
+      state.chats = chats.map(r => ({
+        id: r.id, text: r.text, senderName: r.sender_name,
+        senderRole: r.sender_role, senderEmail: r.sender_email,
+        time: r.time, readByAdmin: r.read_by_admin
+      }));
+    }
+    // Load read log
+    const { data: logs } = await supabase.from('read_log').select('*').order('id', { ascending: false });
+    if (logs && logs.length > 0) {
+      state.readLog = logs.map(r => ({
+        staffName: r.staff_name, staffEmail: r.staff_email,
+        docName: r.doc_name, category: r.category, time: r.time
+      }));
+    }
+    console.log('✅ Cloud data loaded!');
+    updateStats(); renderMaterials(); renderStaff(); renderReadLog(); renderChats();
+  } catch(e) { console.warn('Cloud load failed:', e.message); }
+}
+
+// ── Cloud: real-time chat refresh ──
+async function cloudRefreshChats() {
+  if (!cloudEnabled) return;
+  try {
+    const { data: chats } = await supabase.from('chats').select('*').order('id', { ascending: true });
+    if (chats) {
+      state.chats = chats.map(r => ({
+        id: r.id, text: r.text, senderName: r.sender_name,
+        senderRole: r.sender_role, senderEmail: r.sender_email,
+        time: r.time, readByAdmin: r.read_by_admin
+      }));
+      saveState();
+    }
+  } catch(e) {}
 }
 initSupabase();
 
@@ -944,6 +1066,7 @@ function enterApp() {
   document.getElementById('settingsEmail').textContent = state.settings.adminEmail;
   document.getElementById('settingsMobile').textContent = state.settings.adminMobile;
   updateAdminUI();
+  cloudLoadAll();
   updateStats();
   renderMaterials();
   renderStaff();
@@ -1156,7 +1279,7 @@ function uploadMaterial() {
   const material = { id: Date.now(), name, type, category: cat, desc, tags: [...uploadTags], uploadedAt: new Date().toLocaleDateString('en-IN',{year:'numeric',month:'short',day:'numeric'}), reads: [], mimeType: file ? file.type : null, fileName: file ? file.name : null, fileData: null };
   if (file) {
     const reader = new FileReader();
-    reader.onload = e => { material.fileData = e.target.result; state.materials.unshift(material); saveState(); updateStats(); renderMaterials(); showToast('✅', name + ' uploaded!'); clearUpload(); showView('materials'); };
+    reader.onload = e => { material.fileData = e.target.result; state.materials.unshift(material); saveState(); cloudSaveMaterial(material); updateStats(); renderMaterials(); showToast('✅', name + ' uploaded!'); clearUpload(); showView('materials'); };
     reader.readAsDataURL(file);
   } else { state.materials.unshift(material); saveState(); updateStats(); renderMaterials(); clearUpload(); showView('materials'); }
 }
@@ -1170,7 +1293,7 @@ function clearUpload() {
 function deleteMaterial(id) {
   if (!confirm('Delete this material?')) return;
   state.materials = state.materials.filter(m => m.id !== id);
-  saveState(); updateStats(); renderMaterials(); showToast('🗑️', 'Deleted.');
+  saveState(); cloudDeleteMaterial(id); updateStats(); renderMaterials(); showToast('🗑️', 'Deleted.');
 }
 
 // ═══════════════════════════════════════════════
@@ -1214,7 +1337,8 @@ async function viewMaterial(id) {
   const user = state.currentUser;
   const now = new Date();
   const timeStr = 'Today, ' + now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-  state.readLog.push({staffName:user.name, staffEmail:user.email, docName:m.name, category:m.category, time:timeStr});
+  const logEntry = {staffName:user.name, staffEmail:user.email, docName:m.name, category:m.category, time:timeStr};
+  state.readLog.push(logEntry); cloudSaveReadLog(logEntry);
   if (!m.reads) m.reads = [];
   m.reads.push({name:user.name, time:timeStr});
   const staffMem = state.staff.find(s => s.email.toLowerCase() === user.email.toLowerCase());
@@ -1344,8 +1468,9 @@ function addStaff() {
   const pass = el('newStaffPass').value;
   if (!name||!email||!role||!pass) { showToast('❌','Fill all fields.'); return; }
   if (state.staff.find(s=>s.email.toLowerCase()===email.toLowerCase())) { showToast('❌','Email already exists.'); return; }
-  state.staff.push({id:Date.now(),name,email,role,status:'active',password:pass,reads:[],canDownload:false,joinDate:today()});
-  saveState(); renderStaff(); updateStats(); closeModal('addStaffModal');
+  const newStaff = {id:Date.now(),name,email,role,status:'active',password:pass,reads:[],canDownload:false,joinDate:today()};
+  state.staff.push(newStaff);
+  saveState(); cloudSaveStaff(newStaff); renderStaff(); updateStats(); closeModal('addStaffModal');
   el('newStaffName').value='';el('newStaffEmail').value='';el('newStaffRole').value='';el('newStaffPass').value='';
   showToast('✅','Access granted to '+name+'!');
 }
@@ -1468,8 +1593,9 @@ function sendChat() {
   const text = input.value.trim();
   if (!text) return;
   if (!state.chats) state.chats = [];
-  state.chats.push({ id: Date.now(), text, senderName: state.currentUser.name, senderRole: state.currentUser.role, senderEmail: state.currentUser.email, time: new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}), readByAdmin: state.currentUser.role === 'admin' });
-  saveState(); input.value=''; renderChats(); updateStats();
+  const newChat = { id: Date.now(), text, senderName: state.currentUser.name, senderRole: state.currentUser.role, senderEmail: state.currentUser.email, time: new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}), readByAdmin: state.currentUser.role === 'admin' };
+  state.chats.push(newChat);
+  saveState(); cloudSaveChat(newChat); input.value=''; renderChats(); updateStats();
 }
 
 function renderChats() {
@@ -1490,7 +1616,7 @@ function renderChats() {
   container.scrollTop = container.scrollHeight;
 }
 
-function startChatRefresh() { chatInterval = setInterval(() => { loadState(); if(document.getElementById('view-chat')?.classList.contains('active')) renderChats(); updateStats(); }, 2000); }
+function startChatRefresh() { chatInterval = setInterval(async () => { await cloudRefreshChats(); if(document.getElementById('view-chat')?.classList.contains('active')) renderChats(); updateStats(); }, 3000); }
 function stopChatRefresh() { if(chatInterval) clearInterval(chatInterval); }
 
 // ═══════════════════════════════════════════════
@@ -1506,15 +1632,24 @@ async function sendAI() {
   msgs.innerHTML += `<div id="aiThinking" class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>`;
   msgs.scrollTop = msgs.scrollHeight;
   try {
-    // Call our own Vercel serverless function — no CORS issues, guaranteed to work
-    const resp = await fetch('/api/ai', {
+    const systemPrompt = 'You are TejCrew AI, a hotel and restaurant training assistant. You help restaurant and hotel staff in India learn about kitchen operations, food safety, customer service, hygiene standards, bar operations, and all aspects of hospitality. Give clear, practical, actionable answers. Keep answers concise and easy to understand. Use simple English. Occasionally use relevant emojis. You work for TejCrew, built by Tej Deep — India most advanced hotel training app.';
+    // Using Pollinations AI correct endpoint
+    const payload = {
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: q }
+      ],
+      model: 'mistral',
+      seed: 42,
+      private: true
+    };
+    const resp = await fetch('https://text.pollinations.ai/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: q })
+      body: JSON.stringify(payload)
     });
-    const d = await resp.json();
-    if (!resp.ok || d.error) throw new Error(d.error || 'Server error');
-    const answer = d.answer;
+    if (!resp.ok) throw new Error('AI service returned ' + resp.status);
+    const answer = await resp.text();
     if (!answer || answer.trim().length < 2) throw new Error('Empty response from AI');
     const thinking = document.getElementById('aiThinking');
     if (thinking) thinking.remove();
