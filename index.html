@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FF4500">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TejCrew">
+<meta name="description" content="TejCrew - India's Most Advanced Hotel Training App">
+<title>TejCrew</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+:root {
+  --primary: #FF4500;
+  --primary-dark: #CC3700;
+  --primary-glow: rgba(255,69,0,0.2);
+  --accent: #FFB800;
+  --dark: #0A0A0A;
+  --dark2: #111111;
+  --dark3: #1A1A1A;
+  --dark4: #222222;
+  --border: rgba(255,69,0,0.15);
+  --border2: rgba(255,255,255,0.06);
+  --text: #F5F5F0;
+  --text-muted: #888;
+  --text-dim: #444;
+  --green: #00C853;
+  --blue: #2196F3;
+  --red: #FF1744;
+  --radius: 14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;}
+
+/* ── LOGIN ── */
+#loginScreen{
+  background:var(--dark);
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:2rem;
+  position:relative;
+  overflow:hidden;
+}
+#loginScreen::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 30% 20%, rgba(255,69,0,0.12) 0%, transparent 60%),
+             radial-gradient(ellipse at 70% 80%, rgba(255,184,0,0.06) 0%, transparent 50%);
+  pointer-events:none;
+}
+.login-logo-wrap{
+  width:90px;height:90px;
+  border-radius:24px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;
+  margin-bottom:1.5rem;
+  box-shadow:0 0 40px rgba(255,69,0,0.4);
+  position:relative;z-index:1;
+}
+.login-brand{
+  font-family:'Syne',sans-serif;
+  font-size:2.8rem;font-weight:800;
+  color:var(--text);
+  letter-spacing:-1px;
+  position:relative;z-index:1;
+}
+.login-brand span{color:var(--primary);}
+.login-tagline{
+  font-size:0.75rem;letter-spacing:4px;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:2.5rem;
+  position:relative;z-index:1;
+}
+.login-card{
+  background:var(--dark2);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:2.5rem;
+  width:100%;max-width:420px;
+  position:relative;z-index:1;
+  box-shadow:0 24px 60px rgba(0,0,0,0.5);
+}
+.login-tabs{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:2rem;}
+.login-tab{flex:1;padding:0.75rem;background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:500;transition:all 0.2s;}
+.login-tab.active{background:var(--primary);color:#fff;font-weight:700;}
+.form-group{margin-bottom:1.2rem;}
+.form-group label{display:block;font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:0.5rem;}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:0.9rem 1rem;
+  background:var(--dark3);border:1px solid var(--border2);
+  border-radius:10px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:0.9rem;
+  transition:border-color 0.2s;outline:none;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary);}
+.form-group select option{background:var(--dark3);}
+.btn-primary{
+  width:100%;padding:1rem;
+  background:var(--primary);border:none;border-radius:10px;
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;
+  cursor:pointer;letter-spacing:0.5px;transition:all 0.2s;
+}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);}
+
+/* ── APP ── */
+#appScreen{flex-direction:column;}
+
+/* ── TOPBAR ── */
+.topbar{
+  background:var(--dark2);border-bottom:1px solid var(--border);
+  padding:0 1.5rem;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.topbar-brand{display:flex;align-items:center;gap:0.8rem;}
+.topbar-logo{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+}
+.topbar-name{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:var(--text);}
+.topbar-name span{color:var(--primary);}
+.topbar-right{display:flex;align-items:center;gap:0.8rem;}
+.user-pill{background:var(--dark3);border:1px solid var(--border);border-radius:20px;padding:0.35rem 0.9rem;font-size:0.8rem;color:var(--text-muted);}
+.user-pill span{color:var(--primary);font-weight:600;}
+.btn-logout{padding:0.4rem 1rem;background:rgba(255,23,68,0.15);border:1px solid rgba(255,23,68,0.3);border-radius:8px;color:#FF1744;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn-logout:hover{background:rgba(255,23,68,0.25);}
+
+/* ── LAYOUT ── */
+.app-body{display:flex;flex:1;min-height:calc(100vh - 60px);}
+.sidebar{
+  width:230px;min-width:230px;
+  background:var(--dark2);border-right:1px solid var(--border);
+  padding:1.2rem 0.8rem;display:flex;flex-direction:column;gap:0.2rem;
+  overflow-y:auto;
+}
+.sidebar-section{font-size:0.65rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--text-dim);padding:0.8rem 0.8rem 0.3rem;margin-top:0.5rem;}
+.sidebar-item{
+  display:flex;align-items:center;gap:0.7rem;
+  padding:0.6rem 0.8rem;border-radius:10px;cursor:pointer;
+  font-size:0.85rem;color:var(--text-muted);transition:all 0.15s;
+  border:1px solid transparent;position:relative;
+}
+.sidebar-item:hover{background:var(--dark3);color:var(--text);}
+.sidebar-item.active{background:var(--primary-glow);border-color:var(--border);color:var(--primary);font-weight:600;}
+.sidebar-item .icon{font-size:1rem;width:20px;text-align:center;}
+.badge{margin-left:auto;background:var(--primary);color:#fff;font-size:0.65rem;font-weight:700;border-radius:20px;padding:0.1rem 0.45rem;}
+.badge.green{background:var(--green);}
+.main{flex:1;padding:1.8rem;overflow-y:auto;}
+
+/* ── PAGE HEADER ── */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.page-title{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;color:var(--text);}
+.page-title span{color:var(--primary);}
+.page-desc{font-size:0.83rem;color:var(--text-muted);margin-top:0.3rem;}
+
+/* ── BUTTONS ── */
+.btn-red{padding:0.65rem 1.4rem;background:var(--primary);border:none;border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:0.5rem;transition:all 0.2s;}
+.btn-red:hover{background:var(--primary-dark);transform:translateY(-1px);}
+.btn-outline{padding:0.65rem 1.2rem;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;gap:0.5rem;transition:all 0.2s;}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary);}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:2rem;}
+.stat-card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;transition:all 0.2s;}
+.stat-card:hover{border-color:var(--primary);transform:translateY(-2px);}
+.stat-icon{font-size:1.5rem;margin-bottom:0.6rem;}
+.stat-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:0.4rem;}
+.stat-value{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;color:var(--primary);}
+.stat-sub{font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;}
+
+/* ── CARDS ── */
+.card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.card-header{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;color:var(--primary);}
+.card-body{padding:1.4rem;}
+
+/* ── MATERIALS ── */
+.materials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;}
+.material-card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all 0.2s;cursor:pointer;}
+.material-card:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,69,0,0.15);}
+.material-thumb{height:100px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;position:relative;}
+.material-thumb.pdf{background:linear-gradient(135deg,#2c1010,#1a0707);}
+.material-thumb.doc{background:linear-gradient(135deg,#0a1a2c,#070d1a);}
+.material-thumb.xls{background:linear-gradient(135deg,#0a2c12,#071a0a);}
+.material-thumb.ppt{background:linear-gradient(135deg,#2c1a0a,#1a0d07);}
+.material-thumb.img{background:linear-gradient(135deg,#1a1a2c,#0d0d1a);}
+.material-info{padding:1rem 1.2rem;}
+.material-name{font-size:0.88rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;line-height:1.3;}
+.material-meta{font-size:0.73rem;color:var(--text-dim);margin-bottom:0.6rem;}
+.material-footer{display:flex;align-items:center;justify-content:space-between;}
+.material-cat{background:var(--primary-glow);border:1px solid var(--border);border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;color:var(--primary);}
+.material-actions{display:flex;gap:0.5rem;padding:0.8rem 1.2rem;border-top:1px solid var(--border);}
+.btn-view{flex:1;padding:0.5rem;background:var(--primary-glow);border:1px solid var(--border);border-radius:8px;color:var(--primary);font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:0.4rem;}
+.btn-view:hover{background:var(--primary);color:#fff;}
+.btn-del{padding:0.5rem 0.8rem;background:transparent;border:1px solid rgba(255,23,68,0.3);border-radius:8px;color:#FF1744;font-size:0.78rem;cursor:pointer;transition:all 0.15s;}
+.btn-del:hover{background:rgba(255,23,68,0.15);}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--dark3);}
+th{text-align:left;padding:0.85rem 1.2rem;font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);font-weight:600;border-bottom:1px solid var(--border);}
+td{padding:0.85rem 1.2rem;font-size:0.83rem;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.status-badge{display:inline-flex;align-items:center;gap:0.4rem;padding:0.2rem 0.7rem;border-radius:20px;font-size:0.7rem;font-weight:600;}
+.status-active{background:rgba(0,200,83,0.12);color:#00C853;border:1px solid rgba(0,200,83,0.3);}
+.status-pending{background:rgba(255,184,0,0.12);color:var(--accent);border:1px solid rgba(255,184,0,0.3);}
+.status-revoked{background:rgba(255,23,68,0.1);color:#FF1744;border:1px solid rgba(255,23,68,0.3);}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--primary-glow);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:var(--primary);flex-shrink:0;}
+.user-cell{display:flex;align-items:center;gap:0.8rem;}
+
+/* ── VIEWER MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:200;align-items:center;justify-content:center;padding:0;}
+.modal-overlay.open{display:flex;}
+#viewerModal .modal{width:100%;max-width:900px;height:95vh;display:flex;flex-direction:column;background:var(--dark2);border:1px solid var(--border);border-radius:20px;overflow:hidden;}
+.viewer-topbar{display:flex;align-items:center;gap:0.8rem;padding:0.9rem 1.2rem;border-bottom:1px solid var(--border);flex-shrink:0;}
+.viewer-zoom-bar{display:none;align-items:center;gap:0.6rem;padding:0.5rem 1rem;border-bottom:1px solid var(--border);background:var(--dark3);flex-shrink:0;}
+.zoom-btn{background:var(--dark4);border:1px solid var(--border);border-radius:6px;padding:0.3rem 0.7rem;color:var(--text);cursor:pointer;font-size:1rem;}
+#viewerContent{flex:1;overflow:scroll;-webkit-overflow-scrolling:touch;background:var(--dark);display:flex;flex-direction:column;align-items:center;padding:1rem;position:relative;touch-action:none;cursor:grab;}
+
+/* ── MODAL ── */
+.modal{background:var(--dark2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:1.4rem 1.8rem;border-bottom:1px solid var(--border);}
+.modal-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--primary);}
+.modal-body{padding:1.4rem 1.8rem;}
+.modal-footer{display:flex;gap:0.8rem;padding:1.2rem 1.8rem;border-top:1px solid var(--border);}
+.btn-close{background:transparent;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;}
+.btn-close:hover{background:var(--dark3);color:var(--text);}
+
+/* ── CHAT ── */
+.chat-container{display:flex;flex-direction:column;height:calc(100vh - 280px);min-height:400px;}
+.chat-messages{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.8rem;background:var(--dark);border-radius:12px;margin-bottom:1rem;}
+.chat-msg{max-width:75%;padding:0.75rem 1rem;border-radius:12px;font-size:0.85rem;line-height:1.5;}
+.chat-msg.sent{background:var(--primary);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+.chat-msg.recv{background:var(--dark3);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;border:1px solid var(--border);}
+.chat-msg-meta{font-size:0.68rem;opacity:0.6;margin-top:0.3rem;}
+.chat-input-row{display:flex;gap:0.6rem;}
+.chat-input{flex:1;padding:0.85rem 1rem;background:var(--dark3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none;}
+.chat-input:focus{border-color:var(--primary);}
+
+/* ── MOOD ── */
+.mood-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0.6rem;margin-bottom:1rem;}
+.mood-btn{padding:0.8rem 0.4rem;background:var(--dark3);border:1px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all 0.2s;font-size:0.75rem;color:var(--text-muted);}
+.mood-btn:hover,.mood-btn.selected{background:var(--primary-glow);border-color:var(--primary);color:var(--primary);}
+.mood-btn .mood-emoji{font-size:1.8rem;display:block;margin-bottom:0.3rem;}
+
+/* ── PERFORMANCE ── */
+.perf-card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;margin-bottom:0.8rem;transition:all 0.2s;}
+.perf-card:hover{border-color:var(--primary);}
+.perf-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;}
+.perf-name{font-weight:600;font-size:0.88rem;}
+.perf-score{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:var(--primary);}
+.progress-wrap{background:var(--dark3);border-radius:20px;height:6px;}
+.progress-fill{height:6px;border-radius:20px;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width 0.4s;}
+
+/* ── SOS ── */
+.sos-btn{
+  width:140px;height:140px;border-radius:50%;
+  background:linear-gradient(135deg,#FF1744,#C62828);
+  border:4px solid rgba(255,23,68,0.3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;
+  color:#fff;transition:all 0.2s;
+  box-shadow:0 0 40px rgba(255,23,68,0.4);
+  animation:sos-pulse 2s infinite;
+}
+.sos-btn:hover{transform:scale(1.05);box-shadow:0 0 60px rgba(255,23,68,0.6);}
+@keyframes sos-pulse{0%,100%{box-shadow:0 0 40px rgba(255,23,68,0.4);}50%{box-shadow:0 0 70px rgba(255,23,68,0.7);}}
+
+/* ── UPLOAD ── */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:2.5rem;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:1.2rem;}
+.upload-zone:hover{border-color:var(--primary);background:var(--primary-glow);}
+
+/* ── LEADERBOARD ── */
+.leaderboard-item{display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.04);}
+.leaderboard-item:last-child{border-bottom:none;}
+.lb-rank{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;width:36px;text-align:center;}
+.lb-rank.gold{color:#FFB800;}
+.lb-rank.silver{color:#9E9E9E;}
+.lb-rank.bronze{color:#FF7043;}
+.lb-score{margin-left:auto;font-family:'Syne',sans-serif;font-weight:700;color:var(--primary);}
+
+/* ── SEARCH ── */
+.search-bar{display:flex;align-items:center;background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:0.6rem 1rem;gap:0.6rem;margin-bottom:1.5rem;}
+.search-bar input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem;}
+
+/* ── TABS ── */
+.tab-bar{display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.tab-btn{padding:0.45rem 1rem;background:var(--dark3);border:1px solid var(--border);border-radius:20px;color:var(--text-muted);font-size:0.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.tab-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600;}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:4rem 2rem;color:var(--text-muted);}
+.empty-icon{font-size:3rem;margin-bottom:1rem;opacity:0.4;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--dark2);border:1px solid var(--primary);border-radius:12px;padding:0.9rem 1.4rem;font-size:0.85rem;color:var(--text);z-index:999;display:none;align-items:center;gap:0.6rem;box-shadow:0 8px 24px rgba(0,0,0,0.5);animation:slideIn 0.3s ease;}
+.toast.show{display:flex;}
+@keyframes slideIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+/* ── VIEW ── */
+.view{display:none;}
+.view.active{display:block;}
+
+/* ── SETTINGS ── */
+.settings-section{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.5rem;}
+.settings-header{padding:1rem 1.4rem;border-bottom:1px solid var(--border);font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;color:var(--primary);}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem;border-bottom:1px solid rgba(255,255,255,0.04);gap:1rem;flex-wrap:wrap;}
+.settings-row:last-child{border-bottom:none;}
+
+/* ── AI CHAT ── */
+.ai-bubble{background:linear-gradient(135deg,var(--primary-glow),rgba(255,184,0,0.08));border:1px solid var(--border);border-radius:16px;padding:1rem 1.2rem;margin-bottom:0.6rem;font-size:0.85rem;line-height:1.6;}
+.ai-thinking{display:flex;gap:0.3rem;align-items:center;padding:0.5rem;}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);animation:ai-bounce 1.2s infinite;}
+.ai-dot:nth-child(2){animation-delay:0.2s;}
+.ai-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes ai-bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+
+/* ── ANNOUNCE BANNER ── */
+.announce-banner{background:var(--primary-glow);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1.2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.8rem;font-size:0.85rem;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .topbar-right .user-pill{display:none;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .app-body{flex-direction:column;}
+  .sidebar{width:100%;min-width:unset;flex-direction:row;overflow-x:auto;padding:0.5rem;gap:0.3rem;border-right:none;border-bottom:1px solid var(--border);}
+  .sidebar-section{display:none;}
+  .sidebar-item{flex-direction:column;gap:0.2rem;font-size:0.65rem;padding:0.5rem 0.6rem;white-space:nowrap;min-width:60px;text-align:center;}
+  .sidebar-item .icon{width:auto;}
+  .badge{position:absolute;top:2px;right:2px;font-size:0.55rem;}
+}
+@media(max-width:480px){
+  .materials-grid{grid-template-columns:1fr;}
+  .main{padding:1rem;}
+}
+
+/* ── CALL BTN ── */
+.call-btn{display:flex;align-items:center;gap:0.6rem;padding:0.85rem 1.4rem;background:linear-gradient(135deg,#00C853,#00962a);border:none;border-radius:12px;color:#fff;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(0,200,83,0.3);}
+.call-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,200,83,0.5);}
+.whatsapp-btn{display:flex;align-items:center;gap:0.6rem;padding:0.85rem 1.4rem;background:linear-gradient(135deg,#25D366,#128C7E);border:none;border-radius:12px;color:#fff;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(37,211,102,0.3);}
+.whatsapp-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(37,211,102,0.5);}
+
+/* ── NOTIFICATION DOT ── */
+.notif-dot{width:8px;height:8px;background:var(--primary);border-radius:50%;position:absolute;top:6px;right:6px;}
+
+/* TRAINING PASSPORT */
+.passport-card{background:linear-gradient(135deg,var(--dark2),var(--dark3));border:1px solid var(--primary);border-radius:20px;padding:2rem;position:relative;overflow:hidden;}
+.passport-card::before{content:'TejCrew';position:absolute;right:-20px;top:50%;transform:translateY(-50%) rotate(90deg);font-family:'Syne',sans-serif;font-size:4rem;font-weight:800;color:rgba(255,69,0,0.05);pointer-events:none;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="screen active">
+  <div style="text-align:center;position:relative;z-index:1;">
+    <div class="login-logo-wrap">👨‍🍳</div>
+    <div class="login-brand">Tej<span>Crew</span></div>
+    <div class="login-tagline">India's Most Advanced Hotel Training App</div>
+    <div class="login-card">
+      <div class="login-tabs">
+        <button class="login-tab active" onclick="switchTab('admin')">👔 Admin</button>
+        <button class="login-tab" onclick="switchTab('staff')">🧑‍🍳 Staff</button>
+      </div>
+      <div id="adminLoginForm">
+        <div class="form-group"><label>Email</label><input type="email" id="adminEmail" placeholder="admin@tejcrew.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="adminPass" placeholder="••••••••"></div>
+        <button class="btn-primary" onclick="loginAdmin()">Sign In as Admin →</button>
+        <p style="text-align:center;font-size:0.78rem;color:var(--text-dim);margin-top:1rem;"><span style="color:var(--primary);cursor:pointer;" onclick="openModal('forgotModal')">🔑 Forgot Password?</span></p>
+      </div>
+      <div id="staffLoginForm" style="display:none;">
+        <div id="staffPendingMsg" style="display:none;background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.3);border-radius:10px;padding:1rem;text-align:center;margin-bottom:1rem;font-size:0.83rem;color:var(--accent);">⏳ Your request is pending admin approval.</div>
+        <div id="staffRevokedMsg" style="display:none;background:rgba(255,23,68,0.08);border:1px solid rgba(255,23,68,0.3);border-radius:10px;padding:1rem;text-align:center;margin-bottom:1rem;font-size:0.83rem;color:#FF1744;">🚫 Your access has been revoked.</div>
+        <div class="form-group"><label>Work Email</label><input type="email" id="staffEmail" placeholder="yourname@hotel.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="staffPass" placeholder="••••••••"></div>
+        <button class="btn-primary" onclick="loginStaff()">Sign In →</button>
+        <p style="text-align:center;font-size:0.78rem;color:var(--text-dim);margin-top:1rem;">
+          <span style="color:var(--primary);cursor:pointer;" onclick="openModal('requestModal')">Request Access</span> &nbsp;·&nbsp;
+          <span style="color:var(--primary);cursor:pointer;" onclick="openModal('forgotModal')">Forgot Password?</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appScreen" class="screen">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-logo">👨‍🍳</div>
+      <div class="topbar-name">Tej<span>Crew</span></div>
+    </div>
+    <div class="topbar-right">
+      <div class="user-pill">Logged in as <span id="userDisplayName">Admin</span></div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-section">Navigation</div>
+      <div class="sidebar-item active" data-view="dashboard" onclick="showView('dashboard')"><span class="icon">📊</span> Dashboard</div>
+      <div class="sidebar-item" data-view="materials" onclick="showView('materials')"><span class="icon">📚</span> Training</div>
+      <div class="sidebar-item admin-only" data-view="upload" onclick="showView('upload')"><span class="icon">⬆️</span> Upload</div>
+      <div class="sidebar-section">Team</div>
+      <div class="sidebar-item admin-only" data-view="staff" onclick="showView('staff')"><span class="icon">👥</span> Staff<span class="badge" id="pendingBadge" style="display:none;">0</span></div>
+      <div class="sidebar-item admin-only" data-view="performance" onclick="showView('performance')"><span class="icon">📈</span> Performance</div>
+      <div class="sidebar-item admin-only" data-view="leaderboard" onclick="showView('leaderboard')"><span class="icon">🏆</span> Leaderboard</div>
+
+      <div class="sidebar-section">Tools</div>
+      <div class="sidebar-item" data-view="chat" onclick="showView('chat')"><span class="icon">💬</span> Live Chat<span class="badge" id="chatBadge" style="display:none;">0</span></div>
+      <div class="sidebar-item" data-view="ai" onclick="showView('ai')"><span class="icon">🧠</span> AI Assistant</div>
+      <div class="sidebar-item" data-view="sos" onclick="showView('sos')"><span class="icon">🆘</span> SOS</div>
+      <div class="sidebar-item" data-view="passport" onclick="showView('passport')"><span class="icon">🎓</span> My Passport</div>
+      <div class="sidebar-section admin-only">Admin</div>
+      <div class="sidebar-item admin-only" data-view="announce" onclick="showView('announce')"><span class="icon">📢</span> Announce</div>
+      <div class="sidebar-item admin-only" data-view="readlog" onclick="showView('readlog')"><span class="icon">👁️</span> Read Log</div>
+      <div class="sidebar-item admin-only" data-view="settings" onclick="showView('settings')"><span class="icon">⚙️</span> Settings</div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="announce-banner" id="announceBanner" style="display:none;">
+        <span style="font-size:1.2rem;">📢</span>
+        <div style="flex:1;"><div style="font-weight:600;color:var(--primary);" id="bannerTitle"></div><div id="bannerMsg"></div></div>
+        <span style="cursor:pointer;color:var(--text-dim);" onclick="document.getElementById('announceBanner').style.display='none'">✕</span>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="page-header">
+          <div><div class="page-title">Welcome, <span id="welcomeName">Admin</span></div><div class="page-desc" id="dashDesc">Here's your TejCrew overview</div></div>
+          <div style="display:flex;gap:0.8rem;">
+            <button class="btn-red admin-only" onclick="showView('upload')">⬆️ Upload</button>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-label">Materials</div><div class="stat-value" id="statMaterials">0</div><div class="stat-sub">Documents uploaded</div></div>
+          <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-label">Active Staff</div><div class="stat-value" id="statStaff">0</div><div class="stat-sub">Team members</div></div>
+          <div class="stat-card admin-only"><div class="stat-icon">⏳</div><div class="stat-label">Pending</div><div class="stat-value" id="statPending">0</div><div class="stat-sub">Access requests</div></div>
+          <div class="stat-card"><div class="stat-icon">👁️</div><div class="stat-label">Total Reads</div><div class="stat-value" id="statReads">0</div><div class="stat-sub">Document views</div></div>
+
+          <div class="stat-card admin-only"><div class="stat-icon">💬</div><div class="stat-label">Messages</div><div class="stat-value" id="statMessages">0</div><div class="stat-sub">Unread chats</div></div>
+        </div>
+        <!-- Staff of the Month -->
+        <div id="sotmCard" style="display:none;background:linear-gradient(135deg,rgba(255,184,0,0.1),rgba(255,69,0,0.08));border:1px solid rgba(255,184,0,0.3);border-radius:var(--radius);padding:1.4rem 1.8rem;margin-bottom:1.5rem;">
+          <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin-bottom:0.5rem;">⭐ Staff of the Month</div>
+          <div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;" id="sotmName">—</div>
+          <div style="font-size:0.8rem;color:var(--text-muted);" id="sotmRole">—</div>
+        </div>
+        <!-- Completion -->
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;margin-bottom:1.5rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
+            <div style="font-size:0.85rem;font-weight:600;">📊 Overall Training Completion</div>
+            <span style="color:var(--primary);font-family:'Syne',sans-serif;font-weight:700;" id="completionPct">0%</span>
+          </div>
+          <div class="progress-wrap"><div class="progress-fill" id="completionFill" style="width:0%;"></div></div>
+          <div style="font-size:0.73rem;color:var(--text-muted);margin-top:0.4rem;" id="completionSub">0 reads across 0 staff</div>
+        </div>
+      </div>
+
+      <!-- MATERIALS -->
+      <div class="view" id="view-materials">
+        <div class="page-header">
+          <div><div class="page-title">Training <span>Materials</span></div><div class="page-desc">View-only — documents cannot be downloaded</div></div>
+        </div>
+        <!-- Recently Viewed (staff only) -->
+        <div id="recentlyViewedSection" style="margin-bottom:1.5rem;display:none;">
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--primary);margin-bottom:0.8rem;">🕐 Recently Viewed</div>
+          <div style="display:flex;gap:0.8rem;overflow-x:auto;padding-bottom:0.5rem;" id="recentlyViewedList"></div>
+        </div>
+        <div class="search-bar"><span>🔍</span><input type="text" placeholder="Search by name, tag or category…" id="materialSearch" oninput="renderMaterials()"></div>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="filterByType('All',this)">All</button>
+          <button class="tab-btn" onclick="filterByType('PDF',this)">📄 PDF</button>
+          <button class="tab-btn" onclick="filterByType('Word',this)">📝 Word</button>
+          <button class="tab-btn" onclick="filterByType('Excel',this)">📊 Excel</button>
+          <button class="tab-btn" onclick="filterByType('PowerPoint',this)">📑 PPT</button>
+          <button class="tab-btn" onclick="filterByType('Image',this)">🖼️ Image</button>
+        </div>
+        <div class="materials-grid" id="materialsGrid">
+          <div class="empty" style="grid-column:1/-1"><div class="empty-icon">📂</div><p>No materials yet</p></div>
+        </div>
+      </div>
+
+      <!-- UPLOAD -->
+      <div class="view" id="view-upload">
+        <div class="page-header"><div><div class="page-title">Upload <span>Material</span></div><div class="page-desc">Add training documents for your crew</div></div></div>
+        <div style="max-width:560px;">
+          <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+            <div style="font-size:2rem;margin-bottom:0.6rem;">☁️</div>
+            <div style="font-size:0.9rem;color:var(--text-muted);">Click to select file (PDF, Word, Excel, PPT, Image)</div>
+            <div style="font-size:0.75rem;color:var(--text-dim);margin-top:0.4rem;" id="selectedFileName">No file selected</div>
+          </div>
+          <input type="file" id="fileInput" style="display:none;" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif" onchange="handleFileSelect(this)">
+          <div class="form-group"><label>Material Name *</label><input type="text" id="uploadName" placeholder="e.g. Kitchen Safety Standards 2024"></div>
+          <div class="form-group"><label>Category *</label>
+            <select id="uploadCategory">
+              <option value="">Select category</option>
+              <option>Food Safety & Hygiene</option>
+              <option>Kitchen Operations</option>
+              <option>Customer Service</option>
+              <option>Bar Operations</option>
+              <option>New Joiner Induction</option>
+              <option>Menu Knowledge</option>
+              <option>HR & Compliance</option>
+              <option>Health & Safety</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Description</label><textarea id="uploadDesc" rows="3" placeholder="Brief description…" style="resize:vertical;"></textarea></div>
+          <div class="form-group"><label>Tags (press Enter)</label><input type="text" id="uploadTags" placeholder="e.g. kitchen, safety" onkeydown="addTag(event)"><div id="tagList" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;"></div></div>
+          <div style="display:flex;gap:0.8rem;margin-top:1.5rem;">
+            <button class="btn-red" onclick="uploadMaterial()">⬆️ Upload</button>
+            <button class="btn-outline" onclick="clearUpload()">Clear</button>
+          </div>
+          <div id="cloudUploadStatus" style="display:none;margin-top:1rem;padding:0.8rem 1rem;border-radius:8px;font-size:0.82rem;"></div>
+        </div>
+      </div>
+
+      <!-- STAFF -->
+      <div class="view" id="view-staff">
+        <div class="page-header">
+          <div><div class="page-title">Staff <span>Access</span></div><div class="page-desc">Manage crew logins and permissions</div></div>
+          <button class="btn-red" onclick="openModal('addStaffModal')">➕ Add Staff</button>
+        </div>
+        <div id="pendingSection" style="margin-bottom:2rem;display:none;">
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--primary);margin-bottom:0.8rem;">⏳ Pending Requests</div>
+          <div class="table-wrap"><table><thead><tr><th>Staff</th><th>Requested</th><th>Actions</th></tr></thead><tbody id="pendingTableBody"></tbody></table></div>
+        </div>
+        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:0.8rem;">All Staff</div>
+        <div style="overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);">
+          <table style="min-width:820px;width:100%;border-collapse:collapse;background:var(--dark2);">
+            <thead style="background:var(--dark3);"><tr>
+              <th>Staff Member</th><th>Password</th><th>Role</th><th>Status</th><th>Download</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="staffTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PERFORMANCE -->
+      <div class="view" id="view-performance">
+        <div class="page-header"><div><div class="page-title">Staff <span>Performance</span></div><div class="page-desc">Track training completion and engagement</div></div></div>
+        <div id="performanceList"><div class="empty"><div class="empty-icon">📈</div><p>No staff data yet</p></div></div>
+      </div>
+
+      <!-- LEADERBOARD -->
+      <div class="view" id="view-leaderboard">
+        <div class="page-header"><div><div class="page-title">🏆 <span>Leaderboard</span></div><div class="page-desc">Top performing crew members this month</div></div></div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Training Champions</div></div>
+          <div id="leaderboardList"><div class="empty"><div class="empty-icon">🏆</div><p>No data yet</p></div></div>
+        </div>
+      </div>
+
+
+
+      <!-- LIVE CHAT -->
+      <div class="view" id="view-chat">
+        <div class="page-header"><div><div class="page-title">💬 Live <span>Chat</span></div><div class="page-desc">Real-time communication with your crew</div></div></div>
+        <div style="max-width:700px;">
+          <div id="adminChatList" class="admin-only" style="margin-bottom:1.5rem;"></div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title" id="chatRoomTitle">💬 Team Chat</div>
+            </div>
+            <div class="card-body" style="padding:1rem;">
+              <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                  <div style="text-align:center;color:var(--text-dim);font-size:0.8rem;padding:2rem;">No messages yet. Start the conversation! 👋</div>
+                </div>
+                <div class="chat-input-row">
+                  <input type="text" class="chat-input" id="chatInput" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendChat()">
+                  <button class="btn-red" onclick="sendChat()">Send</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI ASSISTANT -->
+      <div class="view" id="view-ai">
+        <div class="page-header"><div><div class="page-title">🧠 AI <span>Assistant</span></div><div class="page-desc">Ask anything about your training materials</div></div></div>
+        <div style="max-width:700px;">
+          <div style="background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;">
+            <div id="aiMessages" style="min-height:300px;max-height:450px;overflow-y:auto;margin-bottom:1rem;">
+              <div class="ai-bubble">
+                <strong style="color:var(--primary);">🧠 TejCrew AI</strong><br>
+                Hello! I'm your AI Training Assistant. Ask me anything about hotel operations, food safety, customer service, kitchen procedures, or any training topic! I'm here to help your team learn faster. 🍴
+              </div>
+            </div>
+            <div style="display:flex;gap:0.6rem;">
+              <input type="text" class="chat-input" id="aiInput" placeholder="Ask me anything… e.g. 'What is FIFO in kitchen?'" onkeydown="if(event.key==='Enter')sendAI()">
+              <button class="btn-red" onclick="sendAI()">Ask 🧠</button>
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            <button class="tab-btn" onclick="quickAsk('What is FIFO and why is it important in kitchen?')">FIFO Method</button>
+            <button class="tab-btn" onclick="quickAsk('Explain food safety temperature zones')">Temp Zones</button>
+            <button class="tab-btn" onclick="quickAsk('How to handle a customer complaint professionally?')">Complaints</button>
+            <button class="tab-btn" onclick="quickAsk('What are the basic rules of personal hygiene in a kitchen?')">Hygiene Rules</button>
+            <button class="tab-btn" onclick="quickAsk('How to do proper mise en place?')">Mise en Place</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOS -->
+      <div class="view" id="view-sos">
+        <div class="page-header"><div><div class="page-title">🆘 Emergency <span>SOS</span></div><div class="page-desc">One tap emergency alert to admin</div></div></div>
+        <div style="max-width:500px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2rem;padding:2rem 0;">
+            <div class="sos-btn" onclick="triggerSOS()">
+              <span style="font-size:2rem;">🆘</span>
+              <span>SOS</span>
+              <span style="font-size:0.7rem;font-weight:400;opacity:0.8;">EMERGENCY</span>
+            </div>
+            <div style="text-align:center;color:var(--text-muted);font-size:0.85rem;max-width:300px;line-height:1.6;">Press only in a real emergency. This will immediately alert the admin with your name and location.</div>
+            <div style="display:flex;flex-direction:column;gap:0.8rem;width:100%;">
+              <a id="callAdminBtn" href="tel:+919876543210" class="call-btn" style="justify-content:center;text-decoration:none;">
+                📞 Call Admin Directly
+              </a>
+              <a id="waAdminBtn" href="https://wa.me/919876543210?text=Emergency%20from%20TejCrew%20App!" class="whatsapp-btn" style="justify-content:center;text-decoration:none;" target="_blank">
+                💬 WhatsApp Admin
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRAINING PASSPORT -->
+      <div class="view" id="view-passport">
+        <div class="page-header"><div><div class="page-title">🎓 Training <span>Passport</span></div><div class="page-desc">Your complete training record</div></div></div>
+        <div style="max-width:600px;">
+          <div class="passport-card" style="margin-bottom:1.5rem;">
+            <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
+              <div class="avatar" style="width:56px;height:56px;font-size:1.2rem;" id="passportAvatar">?</div>
+              <div>
+                <div style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;" id="passportName">—</div>
+                <div style="font-size:0.8rem;color:var(--text-muted);" id="passportRole">—</div>
+                <div style="font-size:0.72rem;color:var(--primary);margin-top:0.2rem;">TejCrew Member</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+              <div style="background:rgba(255,69,0,0.08);border-radius:10px;padding:0.8rem;text-align:center;">
+                <div style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--primary);" id="passportReads">0</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);">Documents Read</div>
+              </div>
+              <div style="background:rgba(255,69,0,0.08);border-radius:10px;padding:0.8rem;text-align:center;">
+                <div style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--accent);" id="passportPct">0%</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);">Completion</div>
+              </div>
+            </div>
+            <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem;">Training Progress</div>
+            <div class="progress-wrap"><div class="progress-fill" id="passportFill" style="width:0%;"></div></div>
+            <div id="passportBadges" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1.2rem;"></div>
+          </div>
+          <button class="btn-red" style="width:100%;" onclick="printPassport()">🖨️ Print / Download Passport</button>
+        </div>
+      </div>
+
+      <!-- ANNOUNCE -->
+      <div class="view" id="view-announce">
+        <div class="page-header"><div><div class="page-title">📢 <span>Announcements</span></div><div class="page-desc">Send notices to all staff</div></div></div>
+        <div style="max-width:520px;">
+          <div class="form-group"><label>Title</label><input type="text" id="annTitle" placeholder="e.g. New Menu Training Now Live"></div>
+          <div class="form-group"><label>Message</label><textarea id="annMsg" rows="4" placeholder="Your message…" style="resize:vertical;"></textarea></div>
+          <div class="form-group"><label>Type</label>
+            <select id="annType"><option value="info">ℹ️ Info</option><option value="important">⚠️ Important</option><option value="good">✅ Good News</option></select>
+          </div>
+          <button class="btn-red" style="margin-bottom:1.5rem;" onclick="postAnnouncement()">📢 Post Announcement</button>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Active Announcement</div></div>
+            <div class="card-body" id="activeAnnouncement"><div style="color:var(--text-dim);font-size:0.85rem;">No active announcement.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- READ LOG -->
+      <div class="view" id="view-readlog">
+        <div class="page-header"><div><div class="page-title">👁️ Read <span>Log</span></div><div class="page-desc">Track document views</div></div></div>
+        <div class="search-bar"><span>🔍</span><input type="text" placeholder="Filter by staff or document…" id="logSearch" oninput="filterLog()"></div>
+        <div class="table-wrap"><table><thead><tr><th>Staff</th><th>Document</th><th>Category</th><th>Time</th></tr></thead><tbody id="readLogBody"><tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:3rem;">No activity yet</td></tr></tbody></table></div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="view" id="view-settings">
+        <div class="page-header"><div><div class="page-title">⚙️ <span>Settings</span></div><div class="page-desc">Manage your TejCrew hub</div></div></div>
+        <div class="settings-section">
+          <div class="settings-header">👤 Admin Account</div>
+          <div class="settings-row"><div><div style="font-size:0.85rem;">Admin Email</div><div style="font-size:0.75rem;color:var(--text-muted);" id="settingsEmail">—</div></div><button class="btn-outline" style="font-size:0.78rem;" onclick="openModal('changeEmailModal')">✏️ Change</button></div>
+          <div class="settings-row"><div><div style="font-size:0.85rem;">Admin Password</div></div><button class="btn-outline" style="font-size:0.78rem;" onclick="openModal('changePassModal')">🔑 Change</button></div>
+          <div class="settings-row"><div><div style="font-size:0.85rem;">Admin Mobile</div><div style="font-size:0.75rem;color:var(--text-muted);" id="settingsMobile">+91 98765 43210</div></div><button class="btn-outline" style="font-size:0.78rem;" onclick="openModal('changeMobileModal')">📱 Change</button></div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-header">☁️ Cloud Setup (Supabase)</div>
+          <div class="card-body" style="padding:1.2rem 1.4rem;">
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">Connect Supabase to sync data across all devices.</p>
+            <div class="form-group"><label>Supabase Project URL</label><input type="text" id="sbUrl" placeholder="https://xxxx.supabase.co"></div>
+            <div class="form-group"><label>Anon / Public Key</label><input type="text" id="sbKey" placeholder="eyJhbGci…"></div>
+            <div style="display:flex;gap:0.8rem;"><button class="btn-red" onclick="saveSupabase()">☁️ Save & Connect</button><button class="btn-outline" onclick="testSupabase()">🔌 Test</button></div>
+            <div id="cloudSetupStatus" style="margin-top:0.8rem;font-size:0.8rem;color:var(--text-muted);"></div>
+          </div>
+        </div>
+        <div class="settings-section" style="border-color:rgba(255,23,68,0.3);">
+          <div class="settings-header" style="color:#FF1744;">⚠️ Danger Zone</div>
+          <div class="settings-row"><div><div style="font-size:0.85rem;">Clear All Read Logs</div></div><button class="btn-del" onclick="if(confirm('Clear all read logs?')){state.readLog=[];saveState();renderReadLog();showToast('🗑️','Logs cleared.');}">🗑️ Clear</button></div>
+        </div>
+      </div>
+
+    </div><!-- end main -->
+  </div><!-- end app-body -->
+</div><!-- end appScreen -->
+
+<!-- VIEWER MODAL -->
+<div class="modal-overlay" id="viewerModal">
+  <div class="modal" style="max-width:900px;height:95vh;display:flex;flex-direction:column;">
+    <div class="viewer-topbar">
+      <div style="font-size:1.5rem;" id="viewerIconTop">📄</div>
+      <div style="flex:1;">
+        <div id="viewerTitle" style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--primary);"></div>
+        <div id="viewerCategoryTop" style="font-size:0.72rem;color:var(--text-dim);"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <div id="noDownloadBadge" style="display:none;background:rgba(255,23,68,0.1);border:1px solid rgba(255,23,68,0.3);border-radius:20px;padding:0.2rem 0.8rem;font-size:0.7rem;color:#FF1744;">🔒 Read Only</div>
+        <button id="downloadBtn" style="display:none;padding:0.4rem 1rem;background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.4);border-radius:8px;font-size:0.8rem;color:#00C853;font-weight:700;cursor:pointer;" onclick="downloadCurrentDoc()">⬇️ Download</button>
+        <button class="btn-close" onclick="closeModal('viewerModal')">✕</button>
+      </div>
+    </div>
+    <div class="viewer-zoom-bar" id="viewerZoomBar">
+      <button class="zoom-btn" onclick="changeZoom(-0.15)">−</button>
+      <span id="zoomLevel" style="font-size:0.8rem;color:var(--text-muted);min-width:45px;text-align:center;">100%</span>
+      <button class="zoom-btn" onclick="changeZoom(0.15)">+</button>
+      <button class="zoom-btn" onclick="resetZoom()" style="font-size:0.75rem;color:var(--text-muted);">Reset</button>
+      <span style="font-size:0.73rem;color:var(--text-dim);margin-left:0.5rem;">Pinch to zoom • Drag to pan</span>
+    </div>
+    <div id="viewerContent" style="flex:1;overflow:scroll;-webkit-overflow-scrolling:touch;background:var(--dark);display:flex;flex-direction:column;align-items:center;padding:1rem;position:relative;touch-action:none;cursor:grab;" oncontextmenu="return false;"></div>
+  </div>
+</div>
+
+<!-- ADD STAFF MODAL -->
+<div class="modal-overlay" id="addStaffModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add Staff Member</div><button class="btn-close" onclick="closeModal('addStaffModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Full Name</label><input type="text" id="newStaffName" placeholder="e.g. Priya Sharma"></div>
+      <div class="form-group"><label>Work Email</label><input type="email" id="newStaffEmail" placeholder="priya@hotel.com"></div>
+      <div class="form-group"><label>Role / Department</label><input type="text" id="newStaffRole" placeholder="e.g. Chef, Waiter, Bar Staff"></div>
+      <div class="form-group"><label>Temporary Password</label><input type="password" id="newStaffPass" placeholder="Set initial password"></div>
+    </div>
+    <div class="modal-footer"><button class="btn-red" onclick="addStaff()">✅ Grant Access</button><button class="btn-outline" onclick="closeModal('addStaffModal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- REQUEST ACCESS MODAL -->
+<div class="modal-overlay" id="requestModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Request Access</div><button class="btn-close" onclick="closeModal('requestModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Full Name</label><input type="text" id="reqName" placeholder="Your full name"></div>
+      <div class="form-group"><label>Work Email</label><input type="email" id="reqEmail" placeholder="yourname@hotel.com"></div>
+      <div class="form-group"><label>Role / Department</label><input type="text" id="reqRole" placeholder="e.g. Chef, Server"></div>
+      <div class="form-group"><label>Create Password</label><input type="password" id="reqPass" placeholder="Choose a password"></div>
+      <div class="form-group"><label>Confirm Password</label><input type="password" id="reqPassConfirm" placeholder="Re-enter password"><div id="reqPassError" style="font-size:0.75rem;color:#FF1744;margin-top:0.4rem;display:none;">⚠️ Passwords do not match.</div></div>
+    </div>
+    <div class="modal-footer"><button class="btn-red" onclick="submitRequest()">📨 Submit Request</button><button class="btn-outline" onclick="closeModal('requestModal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header"><div class="modal-title">🔑 Reset Password</div><button class="btn-close" onclick="closeModal('forgotModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Admin Email</label><input type="email" id="forgotEmail" placeholder="admin@tejcrew.com"></div>
+      <div class="form-group"><label>New Password</label><input type="password" id="forgotPass" placeholder="New password"></div>
+    </div>
+    <div class="modal-footer"><button class="btn-red" onclick="resetPassword()">🔑 Reset</button><button class="btn-outline" onclick="closeModal('forgotModal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- CHANGE EMAIL -->
+<div class="modal-overlay" id="changeEmailModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header"><div class="modal-title">Change Email</div><button class="btn-close" onclick="closeModal('changeEmailModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Current Password</label><input type="password" id="cePass" placeholder="Current password"></div>
+      <div class="form-group"><label>New Email</label><input type="email" id="ceEmail" placeholder="new@email.com"></div>
+    </div>
+    <div class="modal-footer"><button class="btn-red" onclick="changeEmail()">✅ Update</button><button class="btn-outline" onclick="closeModal('changeEmailModal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD -->
+<div class="modal-overlay" id="changePassModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header"><div class="modal-title">Change Password</div><button class="btn-close" onclick="closeModal('changePassModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Current Password</label><input type="password" id="cpCurrent" placeholder="Current password"></div>
+      <div class="form-group"><label>New Password</label><input type="password" id="cpNew" placeholder="New password"></div>
+    </div>
+    <div class="modal-footer"><button class="btn-red" onclick="changePass()">🔑 Update</button><button class="btn-outline" onclick="closeModal('changePassModal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- CHANGE MOBILE -->
+<div class="modal-overlay" id="changeMobileModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header"><div class="modal-title">Change Mobile</div><button class="btn-close" onclick="closeModal('changeMobileModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Current Password</label><input type="password" id="cmPass" placeholder="Current password"></div>
+      <div class="form-group"><label>New Mobile Number</label><input type="tel" id="cmMobile" placeholder="9876543210" maxlength="10"></div>
+    </div>
+    <div class="modal-footer"><button class="btn-red" onclick="changeMobile()">📱 Update</button><button class="btn-outline" onclick="closeModal('changeMobileModal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="toastIcon"></span><span id="toastMsg"></span></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+const ADMIN_EMAIL_DEFAULT = 'admin@tejcrew.com';
+const ADMIN_PASS_DEFAULT  = 'tejcrew123';
+const ADMIN_MOBILE_DEFAULT = '+919876543210';
+const SUPABASE_URL  = '';
+const SUPABASE_ANON = '';
+
+let supabase = null;
+let cloudEnabled = false;
+let pdfDoc = null;
+let currentZoom = 1.3;
+let currentFilter = 'All';
+let uploadTags = [];
+let selectedMood = null;
+let chatInterval = null;
+
+const state = {
+  currentUser: null,
+  materials: [],
+  staff: [],
+  pendingRequests: [],
+  readLog: [],
+  chats: [],
+  moodLog: [],
+  announcement: null,
+  settings: {
+    adminEmail: ADMIN_EMAIL_DEFAULT,
+    adminPass: ADMIN_PASS_DEFAULT,
+    adminMobile: ADMIN_MOBILE_DEFAULT,
+    hubName: 'TejCrew'
+  }
+};
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('tejcrew_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      Object.assign(state, parsed);
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  try { localStorage.setItem('tejcrew_state', JSON.stringify(state)); } catch(e) {}
+}
+
+loadState();
+
+// ═══════════════════════════════════════════════
+// SUPABASE
+// ═══════════════════════════════════════════════
+function initSupabase() {
+  cloudEnabled = false;
+  try {
+    const url = (localStorage.getItem('tejcrew_sb_url') || SUPABASE_URL || '').trim();
+    const key = (localStorage.getItem('tejcrew_sb_key') || SUPABASE_ANON || '').trim();
+    if (!url || !url.includes('supabase.co') || !key) return;
+    if (!window.supabase) return;
+    supabase = window.supabase.createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+    cloudEnabled = true;
+    console.log('TejCrew cloud connected:', url);
+  } catch(e) { cloudEnabled = false; }
+}
+initSupabase();
+
+// ═══════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('adminLoginForm').style.display = tab === 'admin' ? 'block' : 'none';
+  document.getElementById('staffLoginForm').style.display = tab === 'staff' ? 'block' : 'none';
+}
+
+function loginAdmin() {
+  const email = document.getElementById('adminEmail').value.trim();
+  const pass  = document.getElementById('adminPass').value;
+  if (email === state.settings.adminEmail && pass === state.settings.adminPass) {
+    state.currentUser = { name: 'Admin', email, role: 'admin' };
+    saveState(); enterApp();
+  } else { showToast('❌', 'Invalid admin credentials.'); }
+}
+
+function loginStaff() {
+  const email = document.getElementById('staffEmail').value.trim().toLowerCase();
+  const pass  = document.getElementById('staffPass').value;
+  document.getElementById('staffPendingMsg').style.display = 'none';
+  document.getElementById('staffRevokedMsg').style.display = 'none';
+
+  const pending = state.pendingRequests.find(r => r.email.toLowerCase() === email);
+  if (pending) { document.getElementById('staffPendingMsg').style.display = 'block'; return; }
+
+  const staff = state.staff.find(s => s.email.toLowerCase() === email);
+  if (!staff) { showToast('❌', 'No account found. Request access first.'); return; }
+  if (staff.status === 'revoked') { document.getElementById('staffRevokedMsg').style.display = 'block'; return; }
+  if (staff.status === 'pending') { document.getElementById('staffPendingMsg').style.display = 'block'; return; }
+  if (staff.password !== pass) { showToast('❌', 'Incorrect password.'); return; }
+
+  state.currentUser = { name: staff.name, email: staff.email, role: 'staff', staffId: staff.id };
+  saveState(); enterApp();
+}
+
+function enterApp() {
+  document.getElementById('loginScreen').classList.remove('active');
+  document.getElementById('appScreen').classList.add('active');
+  document.getElementById('userDisplayName').textContent = state.currentUser.name;
+  document.getElementById('welcomeName').textContent = state.currentUser.name;
+  document.getElementById('settingsEmail').textContent = state.settings.adminEmail;
+  document.getElementById('settingsMobile').textContent = state.settings.adminMobile;
+  updateAdminUI();
+  updateStats();
+  renderMaterials();
+  renderStaff();
+  renderPending();
+  renderReadLog();
+  renderPerformance();
+  renderLeaderboard();
+  renderPassport();
+  renderChats();
+  updateAnnouncement();
+  updateCallButtons();
+  showView('dashboard');
+  startChatRefresh();
+}
+
+function logout() {
+  state.currentUser = null;
+  saveState();
+  stopChatRefresh();
+  document.getElementById('appScreen').classList.remove('active');
+  document.getElementById('loginScreen').classList.add('active');
+  document.getElementById('adminEmail').value = '';
+  document.getElementById('adminPass').value = '';
+  document.getElementById('staffEmail').value = '';
+  document.getElementById('staffPass').value = '';
+}
+
+function updateAdminUI() {
+  const isAdmin = state.currentUser?.role === 'admin';
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = isAdmin ? '' : 'none';
+  });
+}
+
+function updateCallButtons() {
+  const mobile = state.settings.adminMobile || '+919876543210';
+  const clean = mobile.replace(/\s/g,'').replace(/^\+/,'');
+  const callBtn = document.getElementById('callAdminBtn');
+  const waBtn = document.getElementById('waAdminBtn');
+  if (callBtn) callBtn.href = 'tel:+' + clean;
+  if (waBtn) waBtn.href = 'https://wa.me/' + clean + '?text=' + encodeURIComponent('Emergency from TejCrew App! Staff needs help.');
+}
+
+// ═══════════════════════════════════════════════
+// VIEWS
+// ═══════════════════════════════════════════════
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  const v = document.getElementById('view-' + name);
+  if (v) v.classList.add('active');
+  const s = document.querySelector('[data-view="' + name + '"]');
+  if (s) s.classList.add('active');
+  if (name === 'materials') renderRecentlyViewed();
+  if (name === 'leaderboard') renderLeaderboard();
+  if (name === 'performance') renderPerformance();
+  if (name === 'passport') renderPassport();
+  if (name === 'chat') { renderChats(); setTimeout(() => { const el = document.getElementById('chatMessages'); if(el) el.scrollTop = el.scrollHeight; }, 100); }
+}
+
+// ═══════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════
+function updateStats() {
+  const activeStaff = state.staff.filter(s => s.status === 'active');
+  el('statMaterials').textContent = state.materials.length;
+  el('statStaff').textContent = activeStaff.length;
+  el('statPending') && (el('statPending').textContent = state.pendingRequests.length);
+  el('statReads').textContent = state.readLog.length;
+  el('statMessages') && (el('statMessages').textContent = state.chats.filter(c => !c.readByAdmin && c.senderRole === 'staff').length);
+
+  // Completion
+  const totalPossible = state.materials.length * activeStaff.length;
+  const totalReads = activeStaff.reduce((acc, s) => acc + (s.reads ? s.reads.length : 0), 0);
+  const pct = totalPossible > 0 ? Math.round((totalReads / totalPossible) * 100) : 0;
+  el('completionPct').textContent = pct + '%';
+  el('completionFill').style.width = pct + '%';
+  el('completionSub').textContent = totalReads + ' reads across ' + activeStaff.length + ' staff';
+
+  // Pending badge
+  const pb = el('pendingBadge');
+  if (pb) { pb.textContent = state.pendingRequests.length; pb.style.display = state.pendingRequests.length > 0 ? 'inline' : 'none'; }
+
+  // Staff of the month
+  if (activeStaff.length > 0) {
+    const top = [...activeStaff].sort((a,b) => (b.reads?.length||0) - (a.reads?.length||0))[0];
+    if (top && (top.reads?.length||0) > 0) {
+      el('sotmCard').style.display = 'block';
+      el('sotmName').textContent = top.name;
+      el('sotmRole').textContent = top.role;
+    }
+  }
+
+  // Today's mood
+  const todayMoods = state.moodLog.filter(m => m.date === today());
+  if (todayMoods.length > 0) {
+    const latest = todayMoods[todayMoods.length-1];
+    el('statMood') && (el('statMood').textContent = latest.emoji);
+  }
+}
+
+function el(id) { return document.getElementById(id); }
+function today() { return new Date().toLocaleDateString('en-IN'); }
+
+// ═══════════════════════════════════════════════
+// MATERIALS
+// ═══════════════════════════════════════════════
+function typeIcon(t) { return {PDF:'📄',Word:'📝',Excel:'📊',PowerPoint:'📑',Image:'🖼️',Video:'🎬'}[t]||'📄'; }
+function typeClass(t) { return {PDF:'pdf',Word:'doc',Excel:'xls',PowerPoint:'ppt',Image:'img',Video:'vid'}[t]||'pdf'; }
+
+function renderRecentlyViewed() {
+  const section = document.getElementById('recentlyViewedSection');
+  const list = document.getElementById('recentlyViewedList');
+  if (!section || !list) return;
+  const isAdmin = state.currentUser?.role === 'admin';
+  if (isAdmin) { section.style.display='none'; return; }
+  // Get last 5 unique docs viewed by this staff
+  const myEmail = state.currentUser?.email?.toLowerCase();
+  const myLogs = state.readLog.filter(l => l.staffEmail?.toLowerCase() === myEmail);
+  const seen = new Set();
+  const recent = [];
+  for (let i = myLogs.length-1; i >= 0 && recent.length < 5; i--) {
+    const log = myLogs[i];
+    const mat = state.materials.find(m => m.name === log.docName);
+    if (mat && !seen.has(mat.id)) { seen.add(mat.id); recent.push(mat); }
+  }
+  if (!recent.length) { section.style.display='none'; return; }
+  section.style.display='block';
+  list.innerHTML = recent.map(m => `
+    <div onclick="viewMaterial(${m.id})" style="flex-shrink:0;width:160px;background:var(--dark2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div class="material-thumb ${typeClass(m.type)}" style="height:70px;font-size:1.8rem;">${typeIcon(m.type)}</div>
+      <div style="padding:0.6rem 0.8rem;">
+        <div style="font-size:0.78rem;font-weight:600;color:var(--text);line-height:1.3;margin-bottom:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.name}</div>
+        <div style="font-size:0.68rem;color:var(--primary);">${m.type}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderMaterials() {
+  const grid = el('materialsGrid');
+  const q = (el('materialSearch')?.value||'').toLowerCase();
+  const isAdmin = state.currentUser?.role === 'admin';
+  let filtered = state.materials.filter(m => {
+    const matchType = currentFilter === 'All' || m.type === currentFilter;
+    const matchQ = !q || m.name.toLowerCase().includes(q) || m.category.toLowerCase().includes(q) || (m.tags||[]).join(' ').toLowerCase().includes(q);
+    return matchType && matchQ;
+  });
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📂</div><p>' + (isAdmin ? 'Upload your first training material.' : 'No documents available yet.') + '</p></div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(m => `
+    <div class="material-card">
+      <div class="material-thumb ${typeClass(m.type)}">${typeIcon(m.type)}</div>
+      <div class="material-info">
+        <div class="material-name">${m.name}</div>
+        <div class="material-meta">${m.uploadedAt} · ${m.type}</div>
+        <div class="material-footer">
+          <div class="material-cat">${m.category}</div>
+          <div style="font-size:0.72rem;color:var(--text-dim);">👁️ ${(m.reads||[]).length}</div>
+        </div>
+      </div>
+      <div class="material-actions">
+        <button class="btn-view" onclick="viewMaterial(${m.id})">👁️ View / Read</button>
+        ${isAdmin ? `<button class="btn-del" onclick="deleteMaterial(${m.id})">🗑️</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function filterByType(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMaterials();
+}
+
+function handleFileSelect(input) {
+  if (input.files[0]) el('selectedFileName').textContent = input.files[0].name;
+}
+
+function addTag(e) {
+  if (e.key !== 'Enter') return;
+  const val = e.target.value.trim();
+  if (val && !uploadTags.includes(val)) { uploadTags.push(val); renderTags(); }
+  e.target.value = '';
+}
+
+function renderTags() {
+  el('tagList').innerHTML = uploadTags.map(t => `<span style="background:var(--primary-glow);border:1px solid var(--border);border-radius:20px;padding:0.2rem 0.7rem;font-size:0.73rem;color:var(--primary);cursor:pointer;" onclick="removeTag('${t}')">${t} ✕</span>`).join('');
+}
+
+function removeTag(tag) { uploadTags = uploadTags.filter(t => t !== tag); renderTags(); }
+
+function uploadMaterial() {
+  const name = el('uploadName').value.trim();
+  const cat  = el('uploadCategory').value;
+  const desc = el('uploadDesc').value.trim();
+  const fileInput = el('fileInput');
+  const file = fileInput.files[0];
+  if (!name || !cat) { showToast('❌', 'Please fill name and category.'); return; }
+  let type = 'PDF';
+  if (file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (['doc','docx'].includes(ext)) type = 'Word';
+    else if (['xls','xlsx'].includes(ext)) type = 'Excel';
+    else if (['ppt','pptx'].includes(ext)) type = 'PowerPoint';
+    else if (['jpg','jpeg','png','gif','webp'].includes(ext)) type = 'Image';
+    else if (['mp4','mov','webm'].includes(ext)) type = 'Video';
+  }
+  const material = { id: Date.now(), name, type, category: cat, desc, tags: [...uploadTags], uploadedAt: new Date().toLocaleDateString('en-IN',{year:'numeric',month:'short',day:'numeric'}), reads: [], mimeType: file ? file.type : null, fileName: file ? file.name : null, fileData: null };
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = e => { material.fileData = e.target.result; state.materials.unshift(material); saveState(); updateStats(); renderMaterials(); showToast('✅', name + ' uploaded!'); clearUpload(); showView('materials'); };
+    reader.readAsDataURL(file);
+  } else { state.materials.unshift(material); saveState(); updateStats(); renderMaterials(); clearUpload(); showView('materials'); }
+}
+
+function clearUpload() {
+  el('uploadName').value = ''; el('uploadCategory').value = ''; el('uploadDesc').value = '';
+  el('uploadTags').value = ''; el('fileInput').value = ''; el('selectedFileName').textContent = 'No file selected';
+  uploadTags = []; renderTags();
+}
+
+function deleteMaterial(id) {
+  if (!confirm('Delete this material?')) return;
+  state.materials = state.materials.filter(m => m.id !== id);
+  saveState(); updateStats(); renderMaterials(); showToast('🗑️', 'Deleted.');
+}
+
+// ═══════════════════════════════════════════════
+// PDF VIEWER
+// ═══════════════════════════════════════════════
+const PDFJS_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+const PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let pdfJsLoaded = false;
+
+function loadPdfJs(cb) {
+  if (pdfJsLoaded) { cb(); return; }
+  const s = document.createElement('script');
+  s.src = PDFJS_CDN;
+  s.onload = () => { pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER; pdfJsLoaded = true; cb(); };
+  document.head.appendChild(s);
+}
+
+async function renderAllPages(pdf, scale) {
+  const container = el('pdfPagesContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  const dpr = window.devicePixelRatio || 2;
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const page = await pdf.getPage(p);
+    const vd = page.getViewport({scale});
+    const vh = page.getViewport({scale: scale * dpr});
+    const canvas = document.createElement('canvas');
+    canvas.width = vh.width; canvas.height = vh.height;
+    canvas.style.cssText = 'display:block;width:100%;max-width:'+vd.width+'px;height:auto;border-radius:6px;margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,0.4);background:#fff;';
+    const lbl = document.createElement('div');
+    lbl.style.cssText = 'font-size:0.7rem;color:var(--text-dim);text-align:center;margin-bottom:6px;';
+    lbl.textContent = 'Page ' + p + ' of ' + pdf.numPages;
+    container.appendChild(lbl); container.appendChild(canvas);
+    await page.render({canvasContext: canvas.getContext('2d'), viewport: vh}).promise;
+  }
+}
+
+async function viewMaterial(id) {
+  const m = state.materials.find(x => x.id === id);
+  if (!m) return;
+  const user = state.currentUser;
+  const now = new Date();
+  const timeStr = 'Today, ' + now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  state.readLog.push({staffName:user.name, staffEmail:user.email, docName:m.name, category:m.category, time:timeStr});
+  if (!m.reads) m.reads = [];
+  m.reads.push({name:user.name, time:timeStr});
+  const staffMem = state.staff.find(s => s.email.toLowerCase() === user.email.toLowerCase());
+  if (staffMem) { if (!staffMem.reads) staffMem.reads = []; staffMem.reads.push({docId:m.id, time:timeStr}); }
+  saveState(); updateStats(); renderRecentlyViewed();
+  window._currentViewMaterial = m;
+  el('viewerTitle').textContent = m.name;
+  el('viewerIconTop').textContent = typeIcon(m.type);
+  el('viewerCategoryTop').textContent = m.category + (m.desc ? ' — ' + m.desc : '');
+  const isAdmin = user.role === 'admin';
+  const canDl = isAdmin;
+  el('downloadBtn').style.display = canDl ? 'inline-flex' : 'none';
+  el('noDownloadBadge').style.display = !canDl ? 'inline-flex' : 'none';
+  currentZoom = 1.3; pdfDoc = null;
+  if (window._resetViewerPan) window._resetViewerPan();
+  el('viewerZoomBar').style.display = 'none';
+  const content = el('viewerContent');
+  if (!m.fileData) { content.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);">📄 No preview available for this document.</div>'; openModal('viewerModal'); return; }
+  const mime = m.mimeType || '';
+  if (mime === 'application/pdf' || m.type === 'PDF') {
+    el('viewerZoomBar').style.display = 'flex';
+    el('zoomLevel').textContent = Math.round(currentZoom*100)+'%';
+    content.innerHTML = '<div style="width:100%;max-width:960px;padding:0 0.5rem;"><div id="pdfLoading" style="text-align:center;padding:2rem;color:var(--text-muted);">⏳ Loading PDF…</div><div id="pdfPagesContainer" style="display:flex;flex-direction:column;align-items:center;width:100%;"></div></div>';
+    openModal('viewerModal');
+    loadPdfJs(async () => {
+      try {
+        const base64 = m.fileData.split(',')[1];
+        const binary = atob(base64); const bytes = new Uint8Array(binary.length);
+        for (let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+        const pdf = await pdfjsLib.getDocument({data:bytes}).promise;
+        pdfDoc = pdf; el('pdfLoading').style.display='none';
+        await renderAllPages(pdf, currentZoom);
+        if (window._wrapViewerContent) setTimeout(window._wrapViewerContent, 80);
+      } catch(err) { el('pdfLoading').innerHTML='❌ Could not render PDF.<br><small>'+err.message+'</small>'; }
+    });
+  } else if (['image/jpeg','image/png','image/gif','image/webp'].includes(mime) || m.type === 'Image') {
+    el('viewerZoomBar').style.display = 'flex'; currentZoom = 1.0; el('zoomLevel').textContent='100%';
+    content.innerHTML = '<div style="width:100%;display:flex;justify-content:center;"><img src="'+m.fileData+'" style="max-width:100%;border-radius:8px;user-select:none;" oncontextmenu="return false;" draggable="false" alt="'+m.name+'"></div>';
+    openModal('viewerModal');
+    if (window._wrapViewerContent) setTimeout(window._wrapViewerContent, 80);
+  } else if (m.type === 'Word') {
+    el('viewerZoomBar').style.display = 'flex'; currentZoom = 1.0; el('zoomLevel').textContent='100%';
+    content.innerHTML = '<div style="width:100%;max-width:860px;"><div id="wordLoading" style="text-align:center;padding:2rem;color:var(--text-muted);">⏳ Converting…</div><div id="wordContainer"></div></div>';
+    openModal('viewerModal');
+    try {
+      const base64=m.fileData.split(',')[1]; const binary=atob(base64); const bytes=new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+      const result = await mammoth.convertToHtml({arrayBuffer:bytes.buffer});
+      el('wordLoading').style.display='none';
+      el('wordContainer').innerHTML='<div style="background:#fff;color:#111;padding:40px 48px;border-radius:8px;font-family:Calibri,Arial,sans-serif;font-size:14px;line-height:1.6;box-shadow:0 4px 24px rgba(0,0,0,0.4);">'+result.value+'</div>';
+      if (window._wrapViewerContent) setTimeout(window._wrapViewerContent, 80);
+    } catch(e) { el('wordLoading').innerHTML='❌ Cannot open this Word document.'; }
+  } else {
+    content.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);">📄 Preview not available. Download to view.</div>';
+    openModal('viewerModal');
+  }
+}
+
+function downloadCurrentDoc() {
+  const m = window._currentViewMaterial;
+  if (!m || !m.fileData) { showToast('❌','File not available.'); return; }
+  const a = document.createElement('a');
+  a.href = m.fileData; a.download = m.fileName || m.name; a.click();
+}
+
+// ═══════════════════════════════════════════════
+// PINCH ZOOM + PAN ENGINE
+// ═══════════════════════════════════════════════
+(function() {
+  var vc, inner;
+  var panX=0,panY=0,startPanX=0,startPanY=0;
+  var pointerStartX=0,pointerStartY=0;
+  var isDragging=false;
+  var pinchStartDist=0,pinchStartZoom=1;
+  var lastMidX=0,lastMidY=0;
+  function dist(t){var dx=t[0].clientX-t[1].clientX,dy=t[0].clientY-t[1].clientY;return Math.sqrt(dx*dx+dy*dy);}
+  function mid(t,r){return{x:(t[0].clientX+t[1].clientX)/2-r.left,y:(t[0].clientY+t[1].clientY)/2-r.top};}
+  function apply(){if(!inner)return;inner.style.transformOrigin='0 0';inner.style.transform='translate('+panX+'px,'+panY+'px) scale('+currentZoom+')';var e=document.getElementById('zoomLevel');if(e)e.textContent=Math.round(currentZoom*100)+'%';}
+  function wrap(){vc=document.getElementById('viewerContent');if(!vc)return;inner=document.getElementById('viewerInner');if(!inner){inner=document.createElement('div');inner.id='viewerInner';inner.style.cssText='display:inline-flex;flex-direction:column;align-items:center;min-width:100%;transform-origin:0 0;will-change:transform;';while(vc.firstChild)inner.appendChild(vc.firstChild);vc.appendChild(inner);}panX=0;panY=0;apply();}
+  document.addEventListener('wheel',function(e){vc=document.getElementById('viewerContent');inner=document.getElementById('viewerInner');if(!vc||!inner||!vc.contains(e.target))return;e.preventDefault();var r=vc.getBoundingClientRect();var mx=e.clientX-r.left,my=e.clientY-r.top;var nz=Math.min(5,Math.max(0.2,currentZoom+(e.deltaY>0?-0.12:0.12)));var ratio=nz/currentZoom;panX=mx-ratio*(mx-panX);panY=my-ratio*(my-panY);currentZoom=nz;apply();},{passive:false});
+  document.addEventListener('touchstart',function(e){vc=document.getElementById('viewerContent');inner=document.getElementById('viewerInner');if(!vc||!inner||!vc.contains(e.target))return;if(e.touches.length===2){e.preventDefault();pinchStartDist=dist(e.touches);pinchStartZoom=currentZoom;var r=vc.getBoundingClientRect(),m=mid(e.touches,r);lastMidX=m.x;lastMidY=m.y;isDragging=false;}else if(e.touches.length===1){isDragging=true;pointerStartX=e.touches[0].clientX;pointerStartY=e.touches[0].clientY;startPanX=panX;startPanY=panY;}},{passive:false});
+  document.addEventListener('touchmove',function(e){vc=document.getElementById('viewerContent');inner=document.getElementById('viewerInner');if(!vc||!inner||!vc.contains(e.target))return;if(e.touches.length===2){e.preventDefault();var d=dist(e.touches);var nz=Math.min(5,Math.max(0.2,pinchStartZoom*(d/pinchStartDist)));var r=vc.getBoundingClientRect(),m=mid(e.touches,r);var ratio=nz/currentZoom;panX=m.x-ratio*(lastMidX-panX);panY=m.y-ratio*(lastMidY-panY);lastMidX=m.x;lastMidY=m.y;currentZoom=nz;apply();}else if(e.touches.length===1&&isDragging){e.preventDefault();panX=startPanX+(e.touches[0].clientX-pointerStartX);panY=startPanY+(e.touches[0].clientY-pointerStartY);apply();}},{passive:false});
+  document.addEventListener('touchend',function(e){if(e.touches.length<2)isDragging=false;},{passive:true});
+  document.addEventListener('mousedown',function(e){vc=document.getElementById('viewerContent');inner=document.getElementById('viewerInner');if(!vc||!inner||!vc.contains(e.target)||e.button!==0)return;isDragging=true;pointerStartX=e.clientX;pointerStartY=e.clientY;startPanX=panX;startPanY=panY;vc.style.cursor='grabbing';e.preventDefault();});
+  document.addEventListener('mousemove',function(e){if(!isDragging)return;vc=document.getElementById('viewerContent');if(!vc)return;panX=startPanX+(e.clientX-pointerStartX);panY=startPanY+(e.clientY-pointerStartY);apply();});
+  document.addEventListener('mouseup',function(){isDragging=false;vc=document.getElementById('viewerContent');if(vc)vc.style.cursor='grab';});
+  window._resetViewerPan=function(){panX=0;panY=0;inner=null;vc=document.getElementById('viewerContent');if(vc)vc.style.cursor='grab';};
+  window._wrapViewerContent=function(){wrap();};
+  window.changeZoom=async function(delta){vc=document.getElementById('viewerContent');inner=document.getElementById('viewerInner');var r=vc?vc.getBoundingClientRect():null;var nz=Math.min(5,Math.max(0.2,currentZoom+delta));if(inner&&r){var cx=r.width/2,cy=r.height/2,ratio=nz/currentZoom;panX=cx-ratio*(cx-panX);panY=cy-ratio*(cy-panY);}currentZoom=nz;if(pdfDoc){var e=document.getElementById('zoomLevel');if(e)e.textContent=Math.round(currentZoom*100)+'%';await renderAllPages(pdfDoc,currentZoom);setTimeout(wrap,80);}else{apply();}};
+  window.resetZoom=async function(){panX=0;panY=0;currentZoom=pdfDoc?1.3:1.0;if(pdfDoc){var e=document.getElementById('zoomLevel');if(e)e.textContent=Math.round(currentZoom*100)+'%';await renderAllPages(pdfDoc,currentZoom);setTimeout(wrap,80);}else{apply();}};
+})();
+
+// ═══════════════════════════════════════════════
+// STAFF MANAGEMENT
+// ═══════════════════════════════════════════════
+function renderStaff() {
+  const tbody = el('staffTableBody');
+  if (!state.staff.length) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem;">No staff added yet.</td></tr>'; return; }
+  tbody.innerHTML = state.staff.map(s => `
+    <tr>
+      <td><div class="user-cell"><div class="avatar">${s.name.split(' ').map(x=>x[0]).join('').toUpperCase()}</div><div><div style="font-weight:500;">${s.name}</div><div style="font-size:0.72rem;color:var(--text-dim);">${s.email}</div></div></div></td>
+      <td><span style="font-size:0.8rem;font-family:monospace;color:var(--text-muted);">${s.password}</span></td>
+      <td><span style="background:rgba(33,150,243,0.1);border:1px solid rgba(33,150,243,0.3);border-radius:20px;padding:0.15rem 0.6rem;font-size:0.7rem;color:#2196F3;">${s.role}</span></td>
+      <td><span class="status-badge status-${s.status}">${s.status==='active'?'🟢 Active':s.status==='pending'?'⏳ Pending':'🚫 Revoked'}</span></td>
+      <td><button onclick="toggleDl(${s.id})" style="padding:0.35rem 0.7rem;border:1px solid ${s.canDownload?'rgba(0,200,83,0.5)':'var(--border)'};border-radius:6px;background:${s.canDownload?'rgba(0,200,83,0.1)':'transparent'};color:${s.canDownload?'#00C853':'var(--text-muted)'};cursor:pointer;font-size:0.75rem;font-weight:700;">${s.canDownload?'✅ ON':'🔒 OFF'}</button></td>
+      <td><div style="display:flex;gap:0.4rem;">${s.status!=='revoked'?`<button class="btn-del" onclick="revokeStaff(${s.id})">🚫 Revoke</button>`:`<button class="btn-outline" style="padding:0.35rem 0.7rem;font-size:0.75rem;" onclick="reinstateStaff(${s.id})">✅ Reinstate</button>`}<button class="btn-del" onclick="deleteStaff(${s.id})">🗑️</button></div></td>
+    </tr>`).join('');
+}
+
+function renderPending() {
+  const pending = state.pendingRequests;
+  const section = el('pendingSection');
+  if (!pending.length) { if(section)section.style.display='none'; return; }
+  if(section)section.style.display='block';
+  el('pendingTableBody').innerHTML = pending.map((r,i) => `
+    <tr>
+      <td><div class="user-cell"><div class="avatar">${r.name.split(' ').map(x=>x[0]).join('').toUpperCase()}</div><div><div style="font-weight:500;">${r.name}</div><div style="font-size:0.72rem;color:var(--text-dim);">${r.email} · ${r.role}</div></div></div></td>
+      <td style="font-size:0.8rem;color:var(--text-dim);">${r.time}</td>
+      <td><div style="display:flex;gap:0.4rem;"><button class="btn-red" style="padding:0.35rem 0.8rem;font-size:0.75rem;" onclick="approveRequest(${i})">✅ Approve</button><button class="btn-del" onclick="denyRequest(${i})">✕ Deny</button></div></td>
+    </tr>`).join('');
+}
+
+function addStaff() {
+  const name = el('newStaffName').value.trim();
+  const email = el('newStaffEmail').value.trim();
+  const role = el('newStaffRole').value.trim();
+  const pass = el('newStaffPass').value;
+  if (!name||!email||!role||!pass) { showToast('❌','Fill all fields.'); return; }
+  if (state.staff.find(s=>s.email.toLowerCase()===email.toLowerCase())) { showToast('❌','Email already exists.'); return; }
+  state.staff.push({id:Date.now(),name,email,role,status:'active',password:pass,reads:[],canDownload:false,joinDate:today()});
+  saveState(); renderStaff(); updateStats(); closeModal('addStaffModal');
+  el('newStaffName').value='';el('newStaffEmail').value='';el('newStaffRole').value='';el('newStaffPass').value='';
+  showToast('✅','Access granted to '+name+'!');
+}
+
+function toggleDl(id) { const s=state.staff.find(x=>x.id===id); if(!s)return; s.canDownload=!s.canDownload; saveState(); renderStaff(); }
+function revokeStaff(id) { const s=state.staff.find(x=>x.id===id); if(!s||!confirm('Revoke access for '+s.name+'?'))return; s.status='revoked'; saveState(); renderStaff(); updateStats(); showToast('🚫',s.name+' revoked.'); }
+function reinstateStaff(id) { const s=state.staff.find(x=>x.id===id); if(!s)return; s.status='active'; saveState(); renderStaff(); updateStats(); showToast('✅',s.name+' reinstated.'); }
+function deleteStaff(id) { const s=state.staff.find(x=>x.id===id); if(!s||!confirm('Delete '+s.name+'?'))return; state.staff=state.staff.filter(x=>x.id!==id); saveState(); renderStaff(); updateStats(); showToast('🗑️','Deleted.'); }
+
+function submitRequest() {
+  const name=el('reqName').value.trim(),email=el('reqEmail').value.trim(),role=el('reqRole').value.trim(),pass=el('reqPass').value,passC=el('reqPassConfirm').value;
+  el('reqPassError').style.display='none';
+  if(!name||!email||!pass||!passC){showToast('❌','Fill all fields.');return;}
+  if(pass!==passC){el('reqPassError').style.display='block';return;}
+  if(state.staff.find(s=>s.email.toLowerCase()===email.toLowerCase())||state.pendingRequests.find(r=>r.email.toLowerCase()===email.toLowerCase())){showToast('❌','Email already registered.');return;}
+  state.pendingRequests.push({name,email,role,password:pass,time:new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})});
+  saveState(); closeModal('requestModal'); showToast('📨','Request submitted! Admin will review.');
+  el('reqName').value='';el('reqEmail').value='';el('reqRole').value='';el('reqPass').value='';el('reqPassConfirm').value='';
+}
+
+function approveRequest(i) { const r=state.pendingRequests[i]; if(!r)return; state.staff.push({id:Date.now(),name:r.name,email:r.email,role:r.role,status:'active',password:r.password,reads:[],canDownload:false,joinDate:today()}); state.pendingRequests.splice(i,1); saveState(); renderStaff(); renderPending(); updateStats(); showToast('✅',r.name+' approved!'); }
+function denyRequest(i) { const r=state.pendingRequests[i]; if(!r||!confirm('Deny '+r.name+'?'))return; state.pendingRequests.splice(i,1); saveState(); renderPending(); updateStats(); showToast('🚫','Request denied.'); }
+
+// ═══════════════════════════════════════════════
+// READ LOG
+// ═══════════════════════════════════════════════
+function renderReadLog() {
+  const tbody=el('readLogBody');
+  let logs=[...state.readLog].reverse();
+  if(!logs.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">No activity yet</td></tr>';return;}
+  tbody.innerHTML=logs.map(l=>`<tr><td><div class="user-cell"><div class="avatar">${l.staffName.split(' ').map(x=>x[0]).join('').toUpperCase()}</div><div><div style="font-weight:500;">${l.staffName}</div><div style="font-size:0.72rem;color:var(--text-dim);">${l.staffEmail}</div></div></div></td><td style="font-size:0.83rem;">${l.docName}</td><td><span class="material-cat">${l.category}</span></td><td style="font-size:0.78rem;color:var(--text-dim);">${l.time}</td></tr>`).join('');
+}
+
+function filterLog() {
+  const q=(el('logSearch')?.value||'').toLowerCase();
+  const tbody=el('readLogBody');
+  let logs=[...state.readLog].reverse().filter(l=>!q||l.staffName.toLowerCase().includes(q)||l.docName.toLowerCase().includes(q));
+  if(!logs.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">No results</td></tr>';return;}
+  tbody.innerHTML=logs.map(l=>`<tr><td>${l.staffName}</td><td>${l.docName}</td><td>${l.category}</td><td style="font-size:0.78rem;color:var(--text-dim);">${l.time}</td></tr>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+// PERFORMANCE & LEADERBOARD
+// ═══════════════════════════════════════════════
+function renderPerformance() {
+  const list = el('performanceList');
+  const activeStaff = state.staff.filter(s=>s.status==='active');
+  if (!activeStaff.length) { list.innerHTML='<div class="empty"><div class="empty-icon">📈</div><p>No staff data yet</p></div>'; return; }
+  const total = state.materials.length;
+  list.innerHTML = activeStaff.sort((a,b)=>(b.reads?.length||0)-(a.reads?.length||0)).map(s => {
+    const reads = s.reads?.length||0;
+    const pct = total>0 ? Math.round((reads/total)*100) : 0;
+    return `<div class="perf-card">
+      <div class="perf-top">
+        <div style="display:flex;align-items:center;gap:0.8rem;">
+          <div class="avatar">${s.name.split(' ').map(x=>x[0]).join('').toUpperCase()}</div>
+          <div><div class="perf-name">${s.name}</div><div style="font-size:0.75rem;color:var(--text-muted);">${s.role}</div></div>
+        </div>
+        <div class="perf-score">${pct}%</div>
+      </div>
+      <div class="progress-wrap"><div class="progress-fill" style="width:${pct}%;"></div></div>
+      <div style="font-size:0.72rem;color:var(--text-dim);margin-top:0.4rem;">${reads} of ${total} documents read</div>
+    </div>`;
+  }).join('');
+}
+
+function renderLeaderboard() {
+  const list = el('leaderboardList');
+  const activeStaff = state.staff.filter(s=>s.status==='active');
+  if (!activeStaff.length) { list.innerHTML='<div class="empty"><div class="empty-icon">🏆</div><p>No data yet</p></div>'; return; }
+  const ranked = [...activeStaff].sort((a,b)=>(b.reads?.length||0)-(a.reads?.length||0)).slice(0,10);
+  const medals = ['🥇','🥈','🥉'];
+  const rankClass = ['gold','silver','bronze'];
+  list.innerHTML = ranked.map((s,i) => `
+    <div class="leaderboard-item">
+      <div class="lb-rank ${rankClass[i]||''}">${medals[i]||('#'+(i+1))}</div>
+      <div class="avatar">${s.name.split(' ').map(x=>x[0]).join('').toUpperCase()}</div>
+      <div><div style="font-weight:600;font-size:0.88rem;">${s.name}</div><div style="font-size:0.73rem;color:var(--text-muted);">${s.role}</div></div>
+      <div class="lb-score">${s.reads?.length||0} reads</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+// MOOD
+// ═══════════════════════════════════════════════
+function selectMood(emoji, label) {
+  selectedMood = {emoji, label};
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
+function submitMood() {
+  if (!selectedMood) { showToast('❌','Please select a mood.'); return; }
+  const entry = { staffName: state.currentUser.name, staffEmail: state.currentUser.email, emoji: selectedMood.emoji, label: selectedMood.label, date: today(), time: new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) };
+  if (!state.moodLog) state.moodLog = [];
+  state.moodLog.push(entry);
+  saveState(); updateStats(); renderTeamMood();
+  showToast(selectedMood.emoji, 'Mood checked in! Have a great shift! 🍴');
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
+  selectedMood = null;
+}
+
+function renderTeamMood() {
+  const list = el('teamMoodList');
+  if (!list) return;
+  const todayMoods = (state.moodLog||[]).filter(m=>m.date===today());
+  if (!todayMoods.length) { list.innerHTML='<div class="empty"><div class="empty-icon">😊</div><p>No check-ins yet today</p></div>'; return; }
+  list.innerHTML = todayMoods.slice().reverse().map(m=>`
+    <div style="display:flex;align-items:center;gap:0.8rem;padding:0.7rem 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+      <span style="font-size:1.5rem;">${m.emoji}</span>
+      <div><div style="font-size:0.85rem;font-weight:500;">${m.staffName}</div><div style="font-size:0.72rem;color:var(--text-muted);">${m.label} · ${m.time}</div></div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+// LIVE CHAT
+// ═══════════════════════════════════════════════
+function sendChat() {
+  const input = el('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  if (!state.chats) state.chats = [];
+  state.chats.push({ id: Date.now(), text, senderName: state.currentUser.name, senderRole: state.currentUser.role, senderEmail: state.currentUser.email, time: new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}), readByAdmin: state.currentUser.role === 'admin' });
+  saveState(); input.value=''; renderChats(); updateStats();
+}
+
+function renderChats() {
+  const container = el('chatMessages');
+  if (!container) return;
+  const msgs = state.chats || [];
+  if (!msgs.length) { container.innerHTML='<div style="text-align:center;color:var(--text-dim);font-size:0.8rem;padding:2rem;">No messages yet. Start the conversation! 👋</div>'; return; }
+  const isAdmin = state.currentUser?.role === 'admin';
+  container.innerHTML = msgs.map(m => {
+    const isMine = m.senderEmail === state.currentUser?.email;
+    return `<div style="display:flex;flex-direction:column;align-items:${isMine?'flex-end':'flex-start'};">
+      ${!isMine?`<div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:0.2rem;">${m.senderName}</div>`:''}
+      <div class="chat-msg ${isMine?'sent':'recv'}">${m.text}<div class="chat-msg-meta">${m.time}</div></div>
+    </div>`;
+  }).join('');
+  // Mark as read by admin
+  if (isAdmin) { let changed=false; state.chats.forEach(m=>{if(!m.readByAdmin){m.readByAdmin=true;changed=true;}}); if(changed){saveState();updateStats();} }
+  container.scrollTop = container.scrollHeight;
+}
+
+function startChatRefresh() { chatInterval = setInterval(() => { loadState(); if(document.getElementById('view-chat')?.classList.contains('active')) renderChats(); updateStats(); }, 2000); }
+function stopChatRefresh() { if(chatInterval) clearInterval(chatInterval); }
+
+// ═══════════════════════════════════════════════
+// AI ASSISTANT
+// ═══════════════════════════════════════════════
+async function sendAI() {
+  const input = el('aiInput');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  const msgs = el('aiMessages');
+  msgs.innerHTML += `<div style="display:flex;justify-content:flex-end;margin-bottom:0.6rem;"><div style="background:var(--primary);color:#fff;border-radius:12px;border-bottom-right-radius:4px;padding:0.7rem 1rem;font-size:0.85rem;max-width:75%;">${q}</div></div>`;
+  msgs.innerHTML += `<div id="aiThinking" class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  try {
+    const GEMINI_KEY = 'AIzaSyD578k_I6cpjNoZXmdB0GVA5Ib4_PMcx0A';
+    const systemPrompt = 'You are TejCrew AI, a hotel and restaurant training assistant. You help restaurant and hotel staff in India learn about kitchen operations, food safety, customer service, hygiene standards, bar operations, and all aspects of hospitality. Give clear, practical, actionable answers. Keep answers concise and easy to understand. Use simple English. Occasionally use relevant emojis. You work for TejCrew, built by Tej Deep — India most advanced hotel training app.';
+    // Use a CORS-friendly endpoint via a script tag trick with fetch
+    const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-pro'];
+    let answer = null;
+    for (const model of models) {
+      try {
+        const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + GEMINI_KEY;
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: systemPrompt + '\n\nUser: ' + q }] }],
+            generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
+          })
+        });
+        const d = await resp.json();
+        if (d.candidates?.[0]?.content?.parts?.[0]?.text) {
+          answer = d.candidates[0].content.parts[0].text;
+          break;
+        }
+        if (d.error) { console.warn('Model ' + model + ' error:', d.error); throw new Error(d.error.message || JSON.stringify(d.error)); }
+      } catch(err) { console.warn('Model ' + model + ' failed:', err.message); }
+    }
+    if (!answer) { throw new Error('All Gemini models failed. Check console for details.'); }
+    const thinking = document.getElementById('aiThinking');
+    if (thinking) thinking.remove();
+    msgs.innerHTML += `<div class="ai-bubble"><strong style="color:var(--primary);">🧠 TejCrew AI</strong><br>${answer.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  } catch(e) {
+    const thinking = document.getElementById('aiThinking');
+    if (thinking) thinking.remove();
+    msgs.innerHTML += `<div class="ai-bubble" style="border-color:rgba(255,23,68,0.3);">❌ Error: ${e.message || e}<br><small style="color:var(--text-dim);">Please open browser console (F12) and tell Tej what the red error says.</small></div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+}
+
+function quickAsk(q) { el('aiInput').value = q; sendAI(); }
+
+// ═══════════════════════════════════════════════
+// SOS
+// ═══════════════════════════════════════════════
+function triggerSOS() {
+  if (!confirm('🆘 Send emergency alert to admin?')) return;
+  const user = state.currentUser;
+  if (!state.chats) state.chats = [];
+  state.chats.push({ id: Date.now(), text: '🆘 EMERGENCY SOS from ' + user.name + '! Immediate assistance required!', senderName: user.name, senderRole: user.role, senderEmail: user.email, time: new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}), readByAdmin: false, isSOS: true });
+  saveState(); updateStats();
+  showToast('🆘', 'SOS sent to admin! Help is coming.');
+  const mobile = (state.settings.adminMobile||'+919876543210').replace(/\s/g,'').replace(/^\+/,'');
+  window.open('https://wa.me/'+mobile+'?text='+encodeURIComponent('🆘 EMERGENCY SOS from '+user.name+' via TejCrew App! Immediate assistance required!'), '_blank');
+}
+
+// ═══════════════════════════════════════════════
+// TRAINING PASSPORT
+// ═══════════════════════════════════════════════
+function renderPassport() {
+  const user = state.currentUser;
+  if (!user) return;
+  const staff = state.staff.find(s=>s.email.toLowerCase()===user.email.toLowerCase());
+  const name = user.name;
+  const role = staff?.role || 'Admin';
+  const reads = staff?.reads?.length || (user.role==='admin' ? state.readLog.filter(l=>l.staffEmail===user.email).length : 0);
+  const total = state.materials.length;
+  const pct = total>0 ? Math.round((reads/total)*100) : 0;
+  el('passportName').textContent = name;
+  el('passportRole').textContent = role;
+  el('passportAvatar').textContent = name.split(' ').map(x=>x[0]).join('').toUpperCase();
+  el('passportReads').textContent = reads;
+  el('passportPct').textContent = pct+'%';
+  el('passportFill').style.width = pct+'%';
+  const badges = [];
+  if (reads >= 1) badges.push('🎯 First Read');
+  if (reads >= 5) badges.push('📚 Bookworm');
+  if (reads >= 10) badges.push('🌟 Star Learner');
+  if (pct >= 50) badges.push('🏅 Halfway Hero');
+  if (pct >= 100) badges.push('🏆 Training Champion');
+  el('passportBadges').innerHTML = badges.map(b=>`<span style="background:var(--primary-glow);border:1px solid var(--border);border-radius:20px;padding:0.25rem 0.75rem;font-size:0.75rem;color:var(--primary);">${b}</span>`).join('');
+}
+
+function printPassport() {
+  const user = state.currentUser;
+  const staff = state.staff.find(s=>s.email.toLowerCase()===user.email.toLowerCase());
+  const reads = staff?.reads?.length || 0;
+  const total = state.materials.length;
+  const pct = total>0 ? Math.round((reads/total)*100) : 0;
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>TejCrew Training Passport</title><style>body{font-family:Arial,sans-serif;background:#fff;color:#111;padding:40px;max-width:600px;margin:auto;} h1{color:#FF4500;} .badge{display:inline-block;background:#fff3ee;border:1px solid #FF4500;border-radius:20px;padding:4px 12px;margin:4px;font-size:13px;} @media print{button{display:none;}}</style></head><body>
+  <h1>🎓 TejCrew Training Passport</h1>
+  <p><strong>Name:</strong> ${user.name}</p>
+  <p><strong>Role:</strong> ${staff?.role||'Admin'}</p>
+  <p><strong>Documents Read:</strong> ${reads} of ${total}</p>
+  <p><strong>Completion:</strong> ${pct}%</p>
+  <p><strong>Date:</strong> ${today()}</p>
+  <h3>Badges Earned:</h3>
+  <div>${reads>=1?'<span class="badge">🎯 First Read</span>':''}${reads>=5?'<span class="badge">📚 Bookworm</span>':''}${reads>=10?'<span class="badge">🌟 Star Learner</span>':''}${pct>=50?'<span class="badge">🏅 Halfway Hero</span>':''}${pct>=100?'<span class="badge">🏆 Training Champion</span>':''}</div>
+  <br><button onclick="window.print()">🖨️ Print</button>
+  </body></html>`);
+  w.document.close();
+}
+
+// ═══════════════════════════════════════════════
+// ANNOUNCEMENTS
+// ═══════════════════════════════════════════════
+function postAnnouncement() {
+  const title=el('annTitle').value.trim(), msg=el('annMsg').value.trim(), type=el('annType').value;
+  if(!title||!msg){showToast('❌','Fill title and message.');return;}
+  state.announcement={title,msg,type};
+  saveState(); updateAnnouncement();
+  showToast('📢','Announcement posted!');
+  el('annTitle').value='';el('annMsg').value='';
+}
+
+function updateAnnouncement() {
+  const ann=state.announcement;
+  const banner=el('announceBanner');
+  const card=el('activeAnnouncement');
+  if(ann&&banner){banner.style.display='flex';el('bannerTitle').textContent=ann.title;el('bannerMsg').textContent=ann.msg;}
+  if(card){card.innerHTML=ann?`<div><div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">${ann.title}</div><div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.8rem;">${ann.msg}</div><button class="btn-del" onclick="removeAnnouncement()">🗑️ Remove</button></div>`:'<div style="color:var(--text-dim);font-size:0.85rem;">No active announcement.</div>';}
+}
+
+function removeAnnouncement(){state.announcement=null;saveState();updateAnnouncement();el('announceBanner').style.display='none';}
+
+// ═══════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════
+function resetPassword() {
+  const email=el('forgotEmail').value.trim(), pass=el('forgotPass').value;
+  if(email===state.settings.adminEmail&&pass){state.settings.adminPass=pass;saveState();closeModal('forgotModal');showToast('✅','Password reset!');}
+  else{showToast('❌','Invalid email.');}
+}
+
+function changeEmail() {
+  const pass=el('cePass').value, email=el('ceEmail').value.trim();
+  if(pass!==state.settings.adminPass){showToast('❌','Wrong password.');return;}
+  state.settings.adminEmail=email;saveState();el('settingsEmail').textContent=email;closeModal('changeEmailModal');showToast('✅','Email updated!');
+}
+
+function changePass() {
+  const cur=el('cpCurrent').value, newp=el('cpNew').value;
+  if(cur!==state.settings.adminPass){showToast('❌','Wrong current password.');return;}
+  state.settings.adminPass=newp;saveState();closeModal('changePassModal');showToast('✅','Password updated!');
+}
+
+function changeMobile() {
+  const pass=el('cmPass').value, mobile=el('cmMobile').value.trim();
+  if(pass!==state.settings.adminPass){showToast('❌','Wrong password.');return;}
+  state.settings.adminMobile='+91'+mobile;saveState();el('settingsMobile').textContent='+91'+mobile;updateCallButtons();closeModal('changeMobileModal');showToast('✅','Mobile updated!');
+}
+
+function saveSupabase() {
+  const url=el('sbUrl').value.trim(), key=el('sbKey').value.trim();
+  if(!url||!key){showToast('❌','Enter both URL and key.');return;}
+  localStorage.setItem('tejcrew_sb_url',url);localStorage.setItem('tejcrew_sb_key',key);
+  initSupabase();
+  el('cloudSetupStatus').textContent=cloudEnabled?'✅ Connected!':'❌ Connection failed. Check your keys.';
+  if(cloudEnabled)showToast('☁️','Cloud connected!');
+}
+
+function testSupabase() {
+  if(!cloudEnabled){showToast('❌','Not connected. Save keys first.');return;}
+  showToast('✅','Cloud connection is active!');
+}
+
+// ═══════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════
+function openModal(id){document.getElementById(id)?.classList.add('open');}
+function closeModal(id){document.getElementById(id)?.classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});});
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+let toastTimer;
+function showToast(icon,msg){
+  const t=el('toast');el('toastIcon').textContent=icon;el('toastMsg').textContent=msg;
+  t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ═══════════════════════════════════════════════
+// INACTIVITY LOGOUT
+// ═══════════════════════════════════════════════
+let inactivityTimer;
+function resetInactivity(){clearTimeout(inactivityTimer);if(state.currentUser)inactivityTimer=setTimeout(()=>{showToast('⏱️','Auto-logged out due to inactivity.');setTimeout(logout,2500);},30*60*1000);}
+['click','touchstart','keydown'].forEach(e=>document.addEventListener(e,resetInactivity,{passive:true}));
+</script>
+</body>
+</html>
