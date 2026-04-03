@@ -13,7 +13,7 @@ export default async function handler(req, res) {
         'Authorization': 'Bearer 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'
       },
       body: JSON.stringify({
-        model: 'llama3-8b-8192',
+        model: 'llama-3.1-8b-instant',
         messages: [
           { role: 'system', content: 'You are TejCrew AI, a hotel and restaurant training assistant. You help restaurant and hotel staff in India learn about kitchen operations, food safety, customer service, hygiene standards, bar operations, and all aspects of hospitality. Give clear, practical, actionable answers. Keep answers concise and easy to understand. Use simple English. Occasionally use relevant emojis. You work for TejCrew, built by Tej Deep — India most advanced hotel training app.' },
           { role: 'user', content: question }
